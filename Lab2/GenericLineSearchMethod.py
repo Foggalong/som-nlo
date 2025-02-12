@@ -92,7 +92,8 @@ def GLSM(x0, func, eps):
 
         if direction == 'CD':
             # coordinate descent
-            dk = np.eye(1, n, (iteration-1) % n).flatten()  # i-th coordinate direction
+            # i-th coordinate direction
+            dk = np.eye(1, n, (iteration-1) % n).flatten()
             if (dk.dot(gk) > 0):  # make sure it is pointing downwards
                 dk = -dk
         elif direction == 'SD':
@@ -164,7 +165,8 @@ def GLSM(x0, func, eps):
         iterates.append(np.array(xk))
 
         if out >= 1:
-            print("it=% 3d: f = % 8.5g, |g| = % 8.5g" % (iteration, fk, LA.norm(gk)))
+            print("it=% 3d: f = % 8.5g, |g| = % 8.5g" % (iteration, fk,
+                                                         LA.norm(gk)))
         if out > 1:
             print("xk=")
             print(xk)

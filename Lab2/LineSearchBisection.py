@@ -41,11 +41,13 @@ def LineSearchBisection(xk, d, c1, c2, func, ret_n_eval=False):
 
     # start loop
     while (found == 0):
+
         # remember old alpha (only for progress report)
         alpha_old = alpha
 
         # test Armijo condition
         if (fk1 > fk + c1*alpha*gk):
+
             alpha_u = alpha
             alpha = 0.5*(alpha_l + alpha_u)
 
@@ -55,6 +57,7 @@ def LineSearchBisection(xk, d, c1, c2, func, ret_n_eval=False):
 
         # test curvature condition
         elif (gk1 < c2*gk):
+
             alpha_l = alpha
             if (alpha_u > 1e10):
                 alpha = 2*alpha_l
@@ -63,15 +66,15 @@ def LineSearchBisection(xk, d, c1, c2, func, ret_n_eval=False):
 
             if (out == 1):
                 print("alpha = % f does not satisfy curvature" % (alpha_old))
-                print("New Interval % f % f" %(alpha_l, alpha_u))
+                print("New Interval % f % f" % (alpha_l, alpha_u))
 
         else:
             found = 1
 
         if (out == 1):
-            print("return alpha = % f" %(alpha))
+            print("return alpha = % f" % (alpha))
 
-        fk1 = func(0, xk+alpha*d)  # value at new trial point
+        fk1 = func(0, xk+alpha*d)         # value at new trial point
         gk1 = func(1, xk+alpha*d).dot(d)  # slope at new trial point
         n_eval = n_eval + 1
 

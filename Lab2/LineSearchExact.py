@@ -22,15 +22,15 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
 
     The exact line search will try to obtain a point alpha at which the
     directional derivative f'(x_k+alpha d, d) is zero
-    ->  \nabla f(x_k + alpha_k d)'* d = 0
+    ->  nabla f(x_k + alpha_k d)'* d = 0
 
     this will do a bisection type algorithm to find the exact minimizer
     - step 1: find an interval [al, au] such that
                 f(x+al) <= f(x), f(x+au) < f(x)  (guaranteed decrease)
               and
-                 d'*\nabla f(x+al*d)<0,  d'*\nabla f(x+au*d)>0
+                 d'*nabla f(x+al*d)<0,  d'*nabla f(x+au*d)>0
         - step 2: then do a bisection linesearch to find the solution to
-                 d'*\nabla f(x+au*d)=0
+                 d'*nabla f(x+au*d)=0
               to within the specified tolerance
     """
 
@@ -67,11 +67,11 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
     # print(gn)
 
     # do a bisection type line search for step 1
-    found = 0  # loop until we find an au with fu<f00 and gu>0
+    found = 0  # loop until we find an au with fu < f00 and gu > 0
     while (found == 0):
 
-        # if fn<f00 and gn>0 we are done
-        # if fn>f00 we need to get to smaller values
+        # if fn < f00 and gn>0 we are done
+        # if fn > f00 we need to get to smaller values
         if out == 1:
             print("alpha = "+str(alpha))
         if fn < f00:
@@ -82,11 +82,11 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
                 gu = gn
                 au = alpha
                 found = 1
-            else:  # gn<0
+            else:  # gn < 0
                 # should try larger values of alpha
                 # but the currently found alpha is a good al
                 if out == 1:
-                    print("still gn<0, try larger alpha and al = alpha")
+                    print("still gn < 0, try larger alpha and al = alpha")
                 al = alpha
                 fl = fn
                 gl = gn
@@ -102,8 +102,8 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
                         print("f(alpha)<0 and g(alpha)<0 -> increase alpha")
         else:  # in case we have stepped too far with alpha and get increase
             if out == 1:
-                print("fn>f0 -> try smaller alpha, reduce au = alpha")
-            # in this case fn>f0:
+                print("fn > fl -> try smaller alpha, reduce au = alpha")
+            # in this case fn > fl:
             # -> should try smaller values of alpha
             au = alpha
             alpha = 0.5*(al+au)

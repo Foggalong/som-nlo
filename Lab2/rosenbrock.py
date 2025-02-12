@@ -8,9 +8,9 @@ def rosenbrock(ord, x, y=None):
         f(x1,x2) = 100*(x2 - x1*x1)**2 + (1-x1)**2
 
     This is called as
-        f = FuncRosenbrock(0, x);   - to get the function value f(x) at x
-        g = FuncRosenbrock(1, x);   - to get the gradient value nabla f(x) at x
-        H = FuncRosenbrock(2, x);   - to get the Hessian value nabla^2 f(x) at x
+        f = FuncRosenbrock(0, x);   - for the function value f(x) at x
+        g = FuncRosenbrock(1, x);   - for the gradient value nabla f(x) at x
+        H = FuncRosenbrock(2, x);   - for the Hessian value nabla^2 f(x) at x
     """
 
     # check how many arguments are passed
@@ -35,7 +35,8 @@ def rosenbrock(ord, x, y=None):
             raise ValueError("Arguments x and y must have the same shape")
         # if we get here we know that x, y are np.arrays of same shape
         if ord > 0:
-            raise ValueError("If x and y are arrays can only evaluate function not gradient or hessian")
+            raise ValueError("If x and y are arrays can only evaluate "
+                             "function not gradient or hessian")
 
         x1 = x
         x2 = y
