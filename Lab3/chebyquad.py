@@ -1,63 +1,53 @@
-"""
-% This implements the chebyquad testfunction (eg. Fletcher 1965)
-% Detailed description in More, Garbow, Hillstrom 
-%
-%       f(x) = \sum_{i=1}^n [f_i(x)]^2
-%     where
-%         f_i(x) = 1/n*(sum_{j=1}^n T_i(x_j)) - \int_0^1 T_i(x) dx 
-%     here T_i(x) is the ith chebychev polynomial shifted to [0,1]
-%    
-%     we have \int_0^1 T_i(x) dx = 0,            i odd
-%                                = -1/(i^2 - 1), i even
-%    
-%     T_i(x) can be obtained from the recurrence
-%       T_0(x) = 1
-%       T_1(x) = x   (likely -1+2*x on [0,1]
-%       T_{n+1}(x) = 2x*T_n(x) - T_{n-1}(x)
-%
-% This is called as 
-%    f = chebyquad(0, x);   - to get the function value f(x) at x
-%    g = chebyquad(1, x);   - to get the gradient value \nabla f(x) at x
-%    H = chebyquad(2, x);   - to get the Hessian value \nabla^2 f(x) at x
-%
-"""
 import numpy as np
 
-# problem data (at the moment hardwired)
 
-# unlike the other methods that accept three argument, this only
-# accepts x as a np.array()
 def chebyquad(ord, x):
-    x = x.flatten()  # in case it was passed as 2-d array. 
+    """
+    This implements the chebyquad test function (eg. Fletcher 1965). Unlike
+    the other methods that accept three argument, this only accepts x as an
+    np.array(). Detailed description in More, Garbow, Hillstrom.
+
+        f(x) = sum_{i=1}^n [f_i(x)]^2
+
+    where
+
+        f_i(x) = 1/n*(sum_{j=1}^n T_i(x_j)) - int_0^1 T_i(x) dx.
+
+    Here T_i(x) is the ith chebychev polynomial shifted to [0,1]. We have
+
+        int_0^1 T_i(x) dx = 0,            i odd,
+                          = -1/(i^2 - 1), i even.
+
+    T_i(x) can be obtained from the recurrence (x in [-1,1])
+
+        T_0(x) = 1
+        T_1(x) = x   (likely -1+2*x on [0,1]
+        T_{n+1}(x) = 2x*T_n(x) - T_{n-1}(x)
+
+    or for y in [0,1]: x = 2y-1 and then evaluate T_k(x)
+
+    This is called as:
+
+        f = chebyquad(0, x);   - to get the function value f(x) at x
+        g = chebyquad(1, x);   - to get the gradient value nabla f(x) at x
+        H = chebyquad(2, x);   - to get the Hessian value nabla^2 f(x) at x
+    """
+
+    x = x.flatten()  # in case it was passed as 2-d array.
     n = x.size
 
-    H=[]
-    
+    H = []
+
     # if we just want the function value
     if ord == 0:
-        # The chebyquad function is defined by
-        #    f(x) = \sum_{i=1}^n (f_i(x))^2,
-        # where
-        #    f_i(x) = 1/n*(sum_{j=1}^n T_i(x_j)) - \int_0^1 T_i(x) dx 
-        # here T_i(x) is the ith chebychev polynomial shifted to [0,1]
-        #
-        # we have \int_0^1 T_i(x) dx = 0,            i odd
-        #                            = -1/(i^2 - 1), i even
-        #
-        # T_i(x) can be obtained from the recurrence (x in [-1,1])
-        #   T_0(x) = 1
-        #   T_1(x) = x   (likely -1+2*x on [0,1]
-        #   T_{n+1}(x) = 2x*T_n(x) - T_{n-1}(x)
-        #
-        # or for y in [0,1]: x = 2y-1 and then evaluate T_k(x)
-        #
         fvec = get_fvec(x)
         return np.sum(fvec*fvec)
-    elif ord==1:
+
+    elif ord == 1:
         fvec = get_fvec(x)
         J = np.zeros((n, n))
         tk = 1./n
-        for j in  range(n):
+        for j in range(n):
             temp1 = 1
             temp2 = 2*x[j] - 1
             temp = 2*temp2
@@ -74,18 +64,19 @@ def chebyquad(ord, x):
         # each column (row?) of J is now the gradient of one of the f_k
         # seems this is J[k][.]
         # f(x) = sum_k f_k(x)^2
-        # => d/dx_i f(x) = \sum_k 2f_k(x) d/dxi f(k)
+        # => d/dx_i f(x) = sum_k 2f_k(x) d/dxi f(k)
         g = np.zeros(n)
         for k in range(n):
             g = g + 2*fvec[k]*J[k]
         return g
-    elif ord ==2 :
-        H = np.zeros((n,n))
+
+    elif ord == 2:
+        H = np.zeros((n, n))
         hesd = np.zeros(n)  # these are the diagonal elements of the Hessian
         hesl = np.zeros(round(n*(n+1)/2))  # L elements by row
         gvec = np.zeros(n)
 
-        # ----- first get the fvec 
+        # ----- first get the fvec
         fvec = get_fvec(x)
 
         # ---------------------
@@ -103,7 +94,7 @@ def chebyquad(ord, x):
             p1 = 0
             p2 = 0
             gvec[0] = s2
-            for i in range(1,n):
+            for i in range(1, n):
                 th = 4*t2 + t*s2 - s1
                 s1 = s2
                 s2 = th
@@ -122,8 +113,8 @@ def chebyquad(ord, x):
             for k in range(j):
                 im = im + 1
                 hesl[im] = 0
-                H[k][j] = 0  #??
-                H[j][k] = 0  #??
+                H[k][j] = 0  # ??
+                H[j][k] = 0  # ??
                 tt1 = 1
                 tt2 = 2*x[k] - 1
                 tt = 2*tt2
@@ -143,13 +134,13 @@ def chebyquad(ord, x):
                 hesl[im] = d2*d1*hesl[im]
                 H[k][j] = d2*d1*H[k][j]
                 H[j][k] = d2*d1*H[j][k]
-                
-        #H = hesdl2H (hesd, hesl)
+
+        # H = hesdl2H (hesd, hesl)
 
         return H
     else:
         print("first argument must be 0, 1 or 2.")
-        
+
 
 def get_fvec(x):
     n = x.size
@@ -160,10 +151,10 @@ def get_fvec(x):
         temp = 2*temp2       # 2*T_n(x)
         for i in range(n):
             fvec[i] = fvec[i] + temp2
-            ti = temp*temp2 - temp1   # T_{n+1} = 
+            ti = temp*temp2 - temp1   # T_{n+1} =
             temp1 = temp2
             temp2 = ti
-            
+
     tk = 1./n
     iev = -1  # i is odd
     for k in range(n):
@@ -174,19 +165,21 @@ def get_fvec(x):
 
     return fvec
 
-def hesdl2H(hesd, hesl):
-    # Reconstitute the Hessian matrix H from hesd and hesl
-    # hesd : a column matrix, the diagonal part of the Hessian
-    # hesl : a column matrix, the lower part terms, row by row.
 
-    
+def hesdl2H(hesd, hesl):
+    """
+    Reconstitute the Hessian matrix H from hesd and hesl
+    hesd : a column matrix, the diagonal part of the Hessian
+    hesl : a column matrix, the lower part terms, row by row.
+    """
+
     H = np.diag(hesd)
     n = hesd.size
     kc = 1
     k1 = 1
     k2 = 1
-    #for i = 2:n
-    for i in range(1,n):
+    # for i = 2:n
+    for i in range(1, n):
         H[i][1:i-1] = hesl[k1:k2]
         H[1:i-1][i] = hesl[k1:k2]
         kc = kc + 1
@@ -194,4 +187,3 @@ def hesdl2H(hesd, hesl):
         k2 = k1 + kc - 1
 
     return H
-

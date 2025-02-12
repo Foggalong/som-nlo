@@ -41,7 +41,8 @@ def ex21(ord, x, y=None):
             raise ValueError("Arguments x and y must have the same shape")
         # if we get here we know that x, y are np.arrays of same shape
         if ord > 0:
-            raise ValueError("If x and y are arrays can only evaluate function not gradient or hessian")
+            raise ValueError("If x and y are arrays can only evaluate "
+                             "function not gradient or hessian")
 
         x1 = x
         x2 = y
@@ -51,7 +52,7 @@ def ex21(ord, x, y=None):
     if ord == 0:  # function value
         return x1**4 + 2*x1**3 + 2*x1**2 + x2**2 - 2*x1*x2
     elif ord == 1:  # gradient
-        # gradient of \|x-loc(i)\|^2 is 2*(x-loc(i))
+        # gradient of |x-loc(i)|^2 is 2*(x-loc(i))
         return np.array([
             4*x1**3 + 6*x1**2 + 4*x1 - 2*x2,  # = dx
             2*x2 - 2*x1                       # = dy
