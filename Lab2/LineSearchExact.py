@@ -137,7 +137,7 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
         n_eval = n_eval + 1
 
         if out == 1:
-            print("am= % 8.5f, slope = % 8.5f" %(am, gn))
+            print("am= % 8.5f, slope = % 8.5f" % (am, gn))
 
         if gn > 0:
             au = am
@@ -149,7 +149,7 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
             gl = gn
 
         if out == 1:
-            print("new interval: al = % 8.5f, au= % 8.5f" %(al, au))
+            print("new interval: al = % 8.5f, au= % 8.5f" % (al, au))
 
     if fn > f00:
         print("We do not have decrease, this should not happen!")

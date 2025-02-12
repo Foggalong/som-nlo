@@ -46,7 +46,8 @@ def ex13(ord: int, x, y=None):
             raise ValueError("Arguments x and y must have the same shape")
         # if we get here we know that x, y are np.arrays of same shape
         if ord > 0:
-            raise ValueError("If x and y are arrays can only evaluate function not gradient or hessian")
+            raise ValueError("If x and y are arrays can only evaluate "
+                             "function not gradient or hessian")
 
         x1 = x
         x2 = y
