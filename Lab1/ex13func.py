@@ -56,7 +56,7 @@ def ex13(ord: int, x, y=None):
     if ord == 0:  # function value
         return 1/3*x1**6 - 2.1*x1**4 + 4*x1**2 + x1*x2 + 4*x2**4 - 4*x2**2
     elif ord == 1:  # gradient
-        # gradient of \|x-loc(i)\|^2 is 2*(x-loc(i))
+        # gradient of |x-loc(i)|^2 is 2*(x-loc(i))
         return np.array([
             2*x1**5 - 8.4*x1**3 + 8*x1 + x2,  # = dx
             x1 + 16*x2**3 - 8*x2              # = dy
