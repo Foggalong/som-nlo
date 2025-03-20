@@ -1,0 +1,4 @@
+option filter_options 'iprint=1';
+solve;
+display x;
+display y;

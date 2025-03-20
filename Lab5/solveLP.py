@@ -1,0 +1,151 @@
+import numpy as np 
+from scipy.optimize import linprog
+
+def solveLP(c, A, bl, bu, cl, cu):
+    """
+     x, status = solveLP(c, A, bl, bu, cl, cu)
+
+     this is a convenient wrapper method that allows to solve an LP problem
+     defined as
+
+       min c'*x subject to bl <= A*x <= bu,
+                           cl <=  x  <=cu
+
+     which is more convenient for SLP/SQP type methods.
+
+     It transforms the problem into the form accepted by scipy.optimize.linprog
+     and then passes it to linprog to be solved.
+
+     linprog solves
+       min c'*x subject to A_ub*x <= b_ub, A_eq*x = b_eq, cl <= x <= cu 
+
+     This method identifies (and keeps) the equality constraints, whereas
+     the inequality (one or two sided) are tranformed from
+
+          bl <= Ax <= bu     to     Ax - s = 0, bl <= s <= bu
+
+     Return values
+      - x: solution (in the given form, not the linprog form, i.e. without s)
+      - status: from linprog (0=solved, 2=infeasible)
+     """
+
+    out = 0
+
+    n = cl.size
+    m = bl.size
+    
+    # 1) ------ change the inequality constraints to equalities -----
+
+    if out>=2:
+        print("solve LP called with the following LP:")
+        print("c = ")
+        print(c)
+        print("A = ")
+        print(A)
+        print("bl = ")
+        print(bl)
+        print("bu = ")
+        print(bu)
+        print("cl = ")
+        print(cl)
+        print("cu = ")
+        print(cu)
+
+    # count number of inequality constraints in A
+
+    nineq = 0
+    for j in range(m):
+        if np.abs(bu[j]-bl[j])>1e-8:
+            nineq = nineq + 1
+
+    # set up a matrix S for slacks (Ax - Ss = 0). Also vectors to hold
+    # - bounds for s: scl, scu
+    # = the new vector b (old bounds for orig equality c/s and 0 for others)
+    S = np.zeros((nineq,m))
+    newb = bl.copy()
+    scl = np.zeros(nineq)
+    scu = np.zeros(nineq)
+    cnt = 0
+    # loop through all constraints and set up S, scl, scu, b
+    for j in range(m):
+        if np.abs(bu[j]-bl[j])>1e-8:
+            S[cnt, j] = 1.0
+            scl[cnt] = bl[j]
+            scu[cnt] = bu[j]
+            newb[j] = 0.0
+            cnt = cnt + 1
+
+    # now we can rewrite bl <= A*x <= bu, cl<=x<=cu as
+    #    [A -S]*[x;s] = newb, scl<=s<=scu, cl<=x<=cu
+
+    # define augmented c, A to pass to linprog
+    caug = np.append(c, np.zeros(nineq))
+    AAug = np.block([A, -S.transpose()])
+    #print(A.shape)
+    #print(S.shape)
+
+    # linprog wants bounds as a list of tuples. Can this be done quicker?
+    bounds = []
+    for i in range(n):
+        bounds.append((cl[i], cu[i]))
+    for i in range(nineq):
+        bounds.append((scl[i], scu[i]))
+
+    # call linprog
+    res = linprog(caug, A_eq=AAug, b_eq = newb, bounds = bounds)
+
+    #print(res)
+    if out>=1:
+        print(res.message)
+    x = res.x[0:n]
+
+    if out>=1:
+        print("Linprog return solution:")
+        print(x)
+
+    if res.status>0:
+        if out>=2:
+
+            for i in range(n):
+                print("cl, x, cu[%d]: %f %f %f"%(i, cl[i], x[i], cu[i]))
+
+            for j in range(m):
+                print("bl, bu[%d]: %f %f"%(j, bl[j], bu[j]))
+  
+    return x, res.status
+
+
+    # Linprog does not return dual variables (Lagrange multipliers)
+    # -> we can work them out by hand (I guess we can always solve the dual)
+
+    # c - A'*lam - mu = 0
+    # to work them out set lamda/mu=0 for basic variables (not at bounds)
+    # the rest should then just give a square linear system of equations
+
+    # code below was a (at the moment) abandoned attempt
+    
+    #ax = np.dot(A, x)
+    #for i in range(m):
+    #    print("bl, Ax, bu[%d]: %f %f %f"%(i, bl[i], ax[i], bu[i]))
+
+    #print(AAug.shape)    
+    #print(caug.shape)
+    ## find number of res.x solution at bounds
+    #natbnd = 0
+    #active = []
+    #for i in range(n):
+    #    if np.abs(res.x[i]-cl[i])<1e-6 or np.abs(res.x[i]-cu[i])<1e-6:
+    #        natbnd = natbnd + 1
+    #        active.append(True)
+    #    else:
+    #        active.append(False)            
+    #for i in range(nineq):
+    #    if np.abs(res.x[n+i]-scl[i])<1e-6 or np.abs(res.x[n+i]-scu[i])<1e-6:
+    #        natbnd = natbnd + 1
+    #        active.append(True)
+    #    else:
+    #        active.append(False)
+    #print("At bound = %d"%(natbnd))
+    #print(active)
+    
+    
