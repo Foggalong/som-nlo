@@ -10,26 +10,24 @@ from QNDirection import QNDirection    # Quasi-Newton
 
 # ------------------ parameters for the method --------------------------
 
-# direction can be 'CD', 'SD', 'CG' for coordinate descent, steepest descent
-#                  'Newton', QN'    for Newton and Quasi-Newton
-# direction = "SD"
-# direction = "Newton"
-# conjugate gradient
-# direction = "CG"
+# direction can be:
+# - 'CD' for coordinate descent,
+# - 'SD' for steepest descent,
+# - 'CG' for conjugate gradient,
+# - 'Newton' for Newton,
+# - 'QN' for Quasi-Newton
 direction = "QN"
 
 # line search can be 'Exact', 'Armijo', 'Wolfe', '1overk', 'fullstep'
-# linesearch = "Armijo"
 linesearch = "Wolfe"
-# linesearch = "Exact"
-# linesearch = "fullstep"
+
 
 # -------------- set line search method parameters ------------------
 c1 = 0.1  # for Armijo/Backtracking linesearch
 c2 = 0.5  # for Bisection linesearch
-tol = 1e-7 # tolerance for exact linesearch
-max_iterations = 3000  # iterationsation limit
-do_CG_restarts = False  # restart CG method every n iterationsations
+tol = 1e-7  # tolerance for exact linesearch
+max_iterations = 3000  # iteration limit
+do_CG_restarts = False  # restart CG method every n iterations
 do_Newton_InertiaCorr = True  # add tau*I to the Newton Hessian for pos def
 minEV = 1e-4
 
@@ -38,7 +36,7 @@ out = 1  # printing from method: 0=quiet, 1=path, 2=diagnostic
 # ------------------ end parameters for the method --------------------------
 
 
-def  GLSM(x0, func, eps):
+def GLSM(x0, func, eps):
     """
     Generic Line Search Method: applies a generic line search method to
     optimize a given function
@@ -67,8 +65,7 @@ def  GLSM(x0, func, eps):
     """
 
     if (not isinstance(x0, np.ndarray)):
-        print("The argument x0 must be a np.array")
-        return
+        raise ValueError("The argument x0 must be a np.array")
 
     n = x0.size
     # this is to keep a list of iterates
