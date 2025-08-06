@@ -1,5 +1,4 @@
 import numpy as np
-import sys   # for the sys.exit() function
 from numpy import linalg as LA
 
 out = 0   # level pf printing from the method (0 or 1)
@@ -152,8 +151,7 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
             print("new interval: al = % 8.5f, au= % 8.5f" % (al, au))
 
     if fn > f00:
-        print("We do not have decrease, this should not happen!")
-        sys.exit()
+        raise ValueError("We do not have decrease, this should not happen!")
 
     # If we get here the slope at g1 should be below tol and am is the exact
     # line search value

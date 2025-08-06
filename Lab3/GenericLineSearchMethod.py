@@ -1,6 +1,5 @@
 import numpy as np
 from numpy import linalg as LA   # We need this module for the norm
-import sys
 
 from LineSearchExact import LineSearchExact as LSExact
 from LineSearchBacktrack import LineSearchBacktrack as LSBacktrack
@@ -133,9 +132,8 @@ def GLSM(x0, func, eps):
 
         # check for descent direction
         if dk.dot(gk) >= 0:
-            print("search direction is not a descent direction: STOP")
             print(dk)
-            sys.exit()
+            raise ValueError("search direction is not a descent direction: STOP")
             dk = -gk
 
         # - - - - - - - - - -  do a line search - - - - - - - - - -
@@ -161,8 +159,7 @@ def GLSM(x0, func, eps):
         elif linesearch == "fullstep":
             alpha = 1
         else:
-            print("Linesearch code not recognized")
-            sys.exit()
+            raise ValueError("Linesearch code not recognized")
 
         tot_n_eval += n_eval
         if out >= 1:
