@@ -38,8 +38,7 @@ def QNDirection(Hk, xkp, xk, gkp, gk):
     #  are enforced by the Bisection Linesearch).
     yd = y.dot(delta)
     if yd <= 0:
-        print("QN-curvature condition not satisfied: STOP!")
-        exit()
+        raise ValueError("QN-curvature condition not satisfied: STOP!")
 
     # Hkp = Hk.copy();
 
