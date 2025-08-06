@@ -80,11 +80,10 @@ def GLSM(x0, func, eps):
     print(fk)
     print(gk)
     if out == 2:
-        print("Initial g0 = ")
-        print(gk)
+        print(f"Initial g0 = \n{gk}")
 
     if out == 1:
-        print("f = % 8.5g, |g| = % 8.5g" % (fk, LA.norm(gk)))
+        print(f"f = {fk:8.5g}, |g| = {LA.norm(gk):8.5g}")
 
     # set these for Conjugate Gradients
     dk_prev = None
@@ -132,14 +131,13 @@ def GLSM(x0, func, eps):
 
         # check for descent direction
         if dk.dot(gk) >= 0:
-            print(dk)
+            print(f"dk = \n{dk}")
             raise ValueError("search direction is not a descent direction: STOP")
             dk = -gk
 
         # - - - - - - - - - -  do a line search - - - - - - - - - -
         if out > 1:
-            print("dk = ")
-            print(dk)
+            print(f"dk = \n{dk}")
 
         # counter for number of function evaluations in line search method
         n_eval = 0
@@ -163,7 +161,7 @@ def GLSM(x0, func, eps):
 
         tot_n_eval += n_eval
         if out >= 1:
-            print("Line search took "+str(n_eval)+" function evaluation")
+            print(f"Line search took {n_eval} function evaluation")
 
         # remember last xk for conjugate gradients and QN
         xk_prev = xk
@@ -182,15 +180,12 @@ def GLSM(x0, func, eps):
         iterate_list.append(np.array(xk))
 
         if out >= 1:
-            print("it=% 3d: f = % 8.5g, |g| = % 8.5g" % (iterations, fk, LA.norm(gk)))
+            print(f"it = {iterations:3d}: f = {fk:8.5g}, |g| = {LA.norm(gk):8.5g}")
         if out > 1:
-            print("xk=")
-            print(xk)
-            print("gk=")
-            print(gk)
+            print(f"xk = {xk}")
+            print(f"gk = {gk}")
 
-    print("Hessian at sol:")
-    print(func(2, xk))
+    print(f"Hessian at sol:\n{func(2, xk)}")
 
-    print("GLSM took total of "+str(tot_n_eval)+" function evaluations")
+    print(f"GLSM took total of {tot_n_eval} function evaluations")
     return np.array(iterate_list)

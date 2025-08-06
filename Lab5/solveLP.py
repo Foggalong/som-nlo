@@ -35,18 +35,12 @@ def solveLP(c, A, bl, bu, cl, cu):
 
     if out >= 2:
         print("solve LP called with the following LP:")
-        print("c = ")
-        print(c)
-        print("A = ")
-        print(A)
-        print("bl = ")
-        print(bl)
-        print("bu = ")
-        print(bu)
-        print("cl = ")
-        print(cl)
-        print("cu = ")
-        print(cu)
+        print(f"c = \n{c}")
+        print(f"A = \n{A}")
+        print(f"bl = \n{bl}")
+        print(f"bu = \n{bu}")
+        print(f"cl = \n{cl}")
+        print(f"cu = \n{cu}")
 
     # count number of inequality constraints in A
 
@@ -91,23 +85,21 @@ def solveLP(c, A, bl, bu, cl, cu):
     # call linprog
     res = linprog(caug, A_eq=AAug, b_eq = newb, bounds = bounds)
 
-    # print(res)
     if out >= 1:
         print(res.message)
     x = res.x[0:n]
 
     if out >= 1:
-        print("Linprog return solution:")
-        print(x)
+        print(f"Linprog return solution:\n{x}")
 
     if res.status > 0:
         if out >= 2:
 
             for i in range(n):
-                print("cl, x, cu[%d]: %f %f %f" % (i, cl[i], x[i], cu[i]))
+                print(f"cl, x, cu[{i:d}]: {cl[i]:f} {x[i]:f} {cu[i]:f}")
 
             for j in range(m):
-                print("bl, bu[%d]: %f %f" % (j, bl[j], bu[j]))
+                print(f"bl, bu[{j:d}]: {bl[j]:f} {bu[j]:f}")
 
     return x, res.status
 
@@ -122,7 +114,7 @@ def solveLP(c, A, bl, bu, cl, cu):
 
 # ax = np.dot(A, x)
 # for i in range(m):
-#     print("bl, Ax, bu[%d]: %f %f %f"%(i, bl[i], ax[i], bu[i]))
+    # print(f"bl, Ax, bu[{i:d}]: {bl[i]:f} {ax[i]:f} {bu[i]:f}")
 
 # print(AAug.shape)
 # print(caug.shape)
@@ -141,5 +133,5 @@ def solveLP(c, A, bl, bu, cl, cu):
 #         active.append(True)
 #     else:
 #         active.append(False)
-# print("At bound = %d"%(natbnd))
+# print(f"At bound = {natbnd:d}")
 # print(active)

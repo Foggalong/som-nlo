@@ -35,7 +35,7 @@ def is_improvement(nlp, xk, xkp):
     mp = fp+gamma*hp
 
     if out >= 1:
-        print("merit function before/after: %f, %f" % (f+gamma*h, fp+gamma*hp))
+        print(f"merit function before/after: {f+gamma*h:f}, {fp+gamma*hp:f}")
 
     if (fp+gamma*hp < f+gamma*h):
         if out >= 1:

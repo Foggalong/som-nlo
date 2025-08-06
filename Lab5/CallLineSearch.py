@@ -37,11 +37,9 @@ tol = 1e-4  # tolerance for the line search method
 path = GLSM(x0, func, tol)
 # path = GTRM(x0, func, tol)
 
-print("Path to solution:")
-print(path)
+print(f"Path to solution: {path}")
 sz, _ = path.shape
 xsol = np.array(path[sz-1])
-print("Solution (xsol) = ")
-print(xsol)
+print(f"Solution (xsol) = {xsol}")
 # for i in range(nlp.nvar):
-#     print("%f %f %f"%(nlp.bl[i], xsol[i], nlp.bu[i]))
+#     print(f"{nlp.bl[i]:f} {xsol[i]:f} {nlp.bu[i]:f}")

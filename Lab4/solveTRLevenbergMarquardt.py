@@ -21,7 +21,7 @@ def solveTRLM(B, g, rho, tol, ret_n_eval=False):
     """
 
     if out >= 1:
-        print("Called solveTRLM with rho=%8.3g" % (rho))
+        print(f"Called solveTRLM with rho={rho:8.3g}")
         print(B)
         print(g)
 
@@ -65,8 +65,7 @@ def solveTRLM(B, g, rho, tol, ret_n_eval=False):
         # dk = LA.solve(B, -g)
         norm_dk = LA.norm(dk)
         if out >= 1:
-            print("  lam=0 => pd and |dk|= ", end="")
-            print(norm_dk)
+            print(f"  lam=0 => pd and |dk|= {norm_dk}")
 
         if norm_dk <= rho:
             if out >= 1:
@@ -90,18 +89,15 @@ def solveTRLM(B, g, rho, tol, ret_n_eval=False):
         if lam_up > 1e10:
             lam = max(2*lam, 1)
             if out >= 1:
-                print("  increase lam to ", end="")
-                print(lam)
+                print(f"  increase lam to {lam}")
         else:
             lam = 0.5*(lam_lo+lam_up)
             if out >= 1:
-                print("  new lam = ", end="")
-                print(lam)
+                print(f"  new lam = {lam}")
 
         # if new_lam>0 and new_lam>=lam_lo and new_lam<=lam_up:
         #     lam = new_lam
-        #     print("  new lam(2) = ",end="")
-        #     print(lam)
+            # print(f"  new lam(2) = {lam}")
         # try to do Cholesky factors
         if out >= 2:
             print("B+lam*I = ")
@@ -127,8 +123,7 @@ def solveTRLM(B, g, rho, tol, ret_n_eval=False):
             qk = LA.solve(L, dk)  # BUG unused variable
             norm_dk = LA.norm(dk)
             if out >= 1:
-                print("  lam>0 => pd and |dk|=", end="")
-                print(norm_dk)
+                print(f"  lam>0 => pd and |dk|={norm_dk}")
 
             # new_lam = lam + np.dot(dk, dk)/np.dot(qk,qk)*(norm_dk-rho)/rho
 
@@ -136,8 +131,8 @@ def solveTRLM(B, g, rho, tol, ret_n_eval=False):
                 lam_up = lam
             else:
                 lam_lo = lam
-            # print("new_lam = %f"%(new_lam))
-            # print("[llo, lup] = [%f, %f]"%(lam_lo, lam_up))
+            # print(f"new_lam = {new_lam:f}")
+            # print(f"[llo, lup] = [{lam_lo:f}, {lam_up:f}]")
 
     if ret_n_eval:
         return dk, n_eval

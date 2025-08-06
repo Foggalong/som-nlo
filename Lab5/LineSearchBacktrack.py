@@ -30,8 +30,8 @@ def LineSearchBacktrack(xk, d, c1, func, ret_n_eval=False):
     n_eval = n_eval + 1
 
     if out > 1:
-        print("f0 = "+str(f0))
-        print("g0 = "+str(g0))
+        print(f"f0 = {f0}")
+        print(f"g0 = {g0}")
 
     alpha = alpha0
 
@@ -40,7 +40,7 @@ def LineSearchBacktrack(xk, d, c1, func, ret_n_eval=False):
     n_eval + n_eval + 1
 
     if out == 1:
-        print("al= % 8.5f, reduction= % 8.5f, required= % 8.5f" %(alpha, f0-f1, (-c1*alpha*g0)))
+        print(f"al= {alpha:8.5f}, reduction= {f0-f1:8.5f}, required= {-c1*alpha*g0:8.5f}")
 
     # start loop (if not enough reduction)
     while (f0-f1 < -c1*alpha*g0):
@@ -51,10 +51,10 @@ def LineSearchBacktrack(xk, d, c1, func, ret_n_eval=False):
 
         # report progress
         if out == 1:
-            print("al= % 8.5f, reduction= % 8.5f, required= % 8.5f" %(alpha, f0-f1, (-c1*alpha*g0)))
+            print(f"al= {alpha:8.5f}, reduction= {f0-f1:8.5f}, required= {-c1*alpha*g0:8.5f}")
 
     if out == 1:
-        print("return al = %8.5f" % alpha)
+        print(f"return al = {alpha:8.5f}")
 
     # LSPlot(xk, d, c1, func, alpha)
 

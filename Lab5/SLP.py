@@ -47,8 +47,7 @@ nlp = NLP.NonlinearProblem(nlfile)
 x0 = 0.3*np.ones(nlp.nvar)
 
 if out >= 2:
-    print("x0 =")
-    print(x0)
+    print(f"x0 =\n{x0}")
 
 
 # make sure that the starting point is within the bounds of the problem
@@ -66,7 +65,7 @@ xk = x0
 # iterate until maximal number of iteration reached
 for iter in range(max_iter):
     if out >= 2:
-        print("================ iter %d =================" % (iter))
+        print(f"================ iter {iter:d} =================")
         print(xk)
 
     # evaluate f(x), nabla f(x), c(x), nabla c(x) at current point x=xk
@@ -79,7 +78,7 @@ for iter in range(max_iter):
     h = util.eval_cviol(nlp, c)
 
     if out >= 1:
-        print("SLP it %3d: f = %12.6f, |g(x)+|+|h(x)| = %12.5g" % (iter+1, f, h))
+        print(f"SLP it {iter+1:3d}: f = {f:12.6f}, |g(x)+|+|h(x)| = {h:12.5g}")
     if out >= 2:
         print(xk)
 
@@ -122,15 +121,14 @@ for iter in range(max_iter):
             rho = rho/4.
 
         if out >= 1:
-            print("new rho = %f" % (rho))
+            print(f"new rho = {rho:f}")
     else:
         xk = xkp
 
 
-print("SLP loop terminated after %d iters." % (iter+1))
+print(f"SLP loop terminated after {iter+1:d} iters.")
 if iter == max_iter-1:
     print("Maximal number of iterations reached.")
 print("Solution/final point is:")
-print("f = %f" % (f))
-print("x* = ")
-print(xk)
+print(f"f = {f:f}")
+print(f"x* = \n{xk}")

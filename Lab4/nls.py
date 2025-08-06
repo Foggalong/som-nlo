@@ -39,8 +39,7 @@ def nls(ord, x):
     x = x.flatten()  # in case it was passed as 2-d array.
     # n = x.size  # BUG unused variable
 
-    # print("nls called with x = ")
-    # print(x)
+    # print(f"nls called with x = \n{x}")
 
     H = []
 

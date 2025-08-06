@@ -43,16 +43,16 @@ class NLTreeNode:
         this traverses the tree and evaluates the function
         """
         if self.type == "n":
-            # print("n node: %f"%(self.data))
+            # print(f"n node: {self.data:f}")
             return self.data
         elif self.type == "v":
             ix = int(self.data)
-            # print("v node: ix= %d, %f"%(ix, x[ix]))
+            # print(f"v node: ix= {ix:d}, {x[ix]:f}")
             return x[ix]
         elif self.type == "+":
             f1 = self.children[0].eval_val(x)
             f2 = self.children[1].eval_val(x)
-            # print("+ node: %f+%f = %f"%(f1, f2, f1+f2))
+            # print(f"+ node: {f1:f}+{f2:f} = {f1+f2:f}")
             return f1+f2
         elif self.type == "-":
             f1 = self.children[0].eval_val(x)
@@ -72,11 +72,11 @@ class NLTreeNode:
         elif self.type == "^":
             # print("^: eval first child: ")
             f1 = self.children[0].eval_val(x)
-            # print("f1 = %f"%(f1))
+            # print(f"f1 = {f1:f}")
             # print("^: eval second child: ")
             f2 = self.children[1].eval_val(x)
-            # print("f2 = %f"%(f2))
-            # print("^ node: %f^%f = %f"%(f1, f2, f1**f2))
+            # print(f"f2 = {f2:f}")
+            # print(f"^ node: {f1:f}^{f2:f} = {f1**f2:f}")
 
             return f1**f2
         elif self.type == "exp":
@@ -91,7 +91,7 @@ class NLTreeNode:
                 ret += self.children[i].eval_val(x)
             return ret
         else:
-            raise ValueError("eval_val(): Operation not implemented yet: \n%s" % (self.type))
+            raise ValueError(f"eval_val(): Operation not implemented yet: \n{self.type:s}")
 
     def eval_grad_forwardADTree(self, x):
         """
@@ -100,12 +100,12 @@ class NLTreeNode:
 
         n = x.size  # get dimension of x
         if self.type == "n":
-            # print("n node: %f"%(self.data))
+            # print(f"n node: {self.data:f}")
             gd = np.zeros(n)
             return (self.data, gd)
         elif self.type == "v":
             ix = int(self.data)
-            # print("v node: ix= %d, %f"%(ix, x[ix]))
+            # print(f"v node: ix= {ix:d}, {x[ix]:f}")
             gd = np.zeros(n)
             gd[ix] = 1
             # print (x[ix], gd)
@@ -113,13 +113,13 @@ class NLTreeNode:
         elif self.type == "+":
             (f1, g1) = self.children[0].eval_grad_forwardADTree(x)
             (f2, g2) = self.children[1].eval_grad_forwardADTree(x)
-            # print("+ node: %f+%f = %f"%(f1, f2, f1+f2))
+            # print(f"+ node: {f1:f}+{f2:f} = {f1+f2:f}")
             # print(f1+f2, g1+g2)
             return (f1+f2, g1+g2)
         elif self.type == "-":
             (f1, g1) = self.children[0].eval_grad_forwardADTree(x)
             (f2, g2) = self.children[1].eval_grad_forwardADTree(x)
-            # print("- node: %f+%f = %f"%(f1, f2, f1+f2))
+            # print(f"- node: {f1:f}+{f2:f} = {f1+f2:f}")
             # print(f1-f2,g1-g2)
             return (f1-f2, g1-g2)
         elif self.type == "un-":
@@ -128,7 +128,7 @@ class NLTreeNode:
         elif self.type == "*":
             (f1, g1) = self.children[0].eval_grad_forwardADTree(x)
             (f2, g2) = self.children[1].eval_grad_forwardADTree(x)
-            # print("+ node: %f+%f = %f"%(f1, f2, f1+f2))
+            # print(f"+ node: {f1:f}+{f2:f} = {f1+f2:f}")
             # print("* node:")
             # print(f1*f2, f2*g1+f1*g2)
             return (f1*f2, f2*g1+f1*g2)
@@ -138,11 +138,9 @@ class NLTreeNode:
                 print("Eval grad ^ node")
             (f1, g1) = self.children[0].eval_grad_forwardADTree(x)
             (f2, g2) = self.children[1].eval_grad_forwardADTree(x)
-            # print("f1 = %f, g1 = "%(f1),end="")
-            # print(g1)
-            # print("f2 = %f, g2 = "%(f2),end="")
-            # print(g2)
-            # print("+ node: %f+%f = %f"%(f1, f2, f1+f2))
+            # print(f"f1 = {f1:f}, g1 = {g1}")
+            # print(f"f2 = {f2:f}, g2 = {g2}")
+            # print(f"+ node: {f1:f}+{f2:f} = {f1+f2:f}")
             val = f1**f2
             gd = f2*(f1**(f2-1))*g1
             if np.linalg.norm(g2-np.zeros(n)) > 1e-6:
@@ -158,7 +156,7 @@ class NLTreeNode:
                 gd += gdi
             return (val, gd)
         else:
-            raise ValueError("eval_grad(): Operation not implemented yet: \n%s" % (self.type))
+            raise ValueError(f"eval_grad(): Operation not implemented yet: \n{self.type:s}")
 
     def eval_hess_forwardADTree(self, x):
         """
@@ -166,14 +164,14 @@ class NLTreeNode:
         """
         n = x.size  # get dimension of x
         if self.type == "n":
-            # print("n node: %f"%(self.data))
+            # print(f"n node: {self.data:f}")
             gd = np.zeros(n)
             H = np.zeros((n, n))
             return (self.data, gd, H)
         elif self.type == "v":
             ix = int(self.data)
             if out >= 1:
-                print("v node: ix= %d, %f" % (ix, x[ix]))
+                print(f"v node: ix= {ix:d}, {x[ix]:f}")
             gd = np.zeros(n)
             gd[ix] = 1
             if out >= 1:
@@ -184,14 +182,14 @@ class NLTreeNode:
             (f1, g1, H1) = self.children[0].eval_hess_forwardADTree(x)
             (f2, g2, H2) = self.children[1].eval_hess_forwardADTree(x)
             if out >= 1:
-                print("+ node: %f+%f = %f" % (f1, f2, f1+f2))
+                print(f"+ node: {f1:f}+{f2:f} = {f1+f2:f}")
                 print(f1+f2, g1+g2, H1+H2)
             return (f1+f2, g1+g2, H1+H2)
         elif self.type == "-":
             (f1, g1, H1) = self.children[0].eval_hess_forwardADTree(x)
             (f2, g2, H2) = self.children[1].eval_hess_forwardADTree(x)
             if out >= 1:
-                print("- node: %f+%f = %f" % (f1, f2, f1+f2))
+                print(f"- node: {f1:f}+{f2:f} = {f1+f2:f}")
                 print(f1-f2, g1-g2, H1-H2)
             return (f1-f2, g1-g2, H1-H2)
         elif self.type == "un-":
@@ -200,7 +198,7 @@ class NLTreeNode:
         elif self.type == "*":
             (f1, g1, H1) = self.children[0].eval_hess_forwardADTree(x)
             (f2, g2, H2) = self.children[1].eval_hess_forwardADTree(x)
-            # print("+ node: %f+%f = %f"%(f1, f2, f1+f2))
+            # print(f"+ node: {f1:f}+{f2:f} = {f1+f2:f}")
             if out >= 1:
                 print("* node:")
                 print(f1*f2, f2*g1+f1*g2)
@@ -212,11 +210,9 @@ class NLTreeNode:
             (f1, g1, H1) = self.children[0].eval_hess_forwardADTree(x)
             (f2, g2, H2) = self.children[1].eval_hess_forwardADTree(x)
             if out >= 1:
-                print("f1 = %f, g1 = " % (f1), end="")
-                print(g1)
-                print("f2 = %f, g2 = " % (f2), end="")
-                print(g2)
-            # print("+ node: %f+%f = %f"%(f1, f2, f1+f2))
+                print(f"f1 = {f1:f}, g1 = {g1}")
+                print(f"f2 = {f2:f}, g2 = {g2}")
+            print(f"+ node: {f1:f}+{f2:f} = {f1+f2:f}")
             val = f1**f2
             gd = f2*(f1**(f2-1))*g1
             if np.linalg.norm(g2-np.zeros(n)) > 1e-6:
@@ -238,7 +234,7 @@ class NLTreeNode:
                 H += Hi
             return (val, gd, H)
         else:
-            raise ValueError("eval_hess(): Operation not implemented yet: \n%s" % (self.type))
+            raise ValueError(f"eval_hess(): Operation not implemented yet: \n{self.type:s}")
 
     # - - - - - - - -  print methods - - - - - - - -
 
@@ -278,7 +274,7 @@ class NLTreeNode:
             ret += ")"
             return ret
         else:
-            raise ValueError("to_string(): Operation not implemented yet: %s" % (self.type))
+            raise ValueError(f"to_string(): Operation not implemented yet: {self.type:s}")
         print(self.type)
 
     def get_flat_tree(self, nvar):
@@ -293,10 +289,7 @@ class NLTreeNode:
         cnt = 0
         for nd in flat:
             if out >= 1:
-                print("nd[%d] = %s (%f), chd = %d, nprt = %d" % (cnt, nd.type,
-                                                                 nd.data,
-                                                                 nd.nchd,
-                                                                 nd.nprt))
+                print(f"nd[{cnt:d}] = {nd.type:s} ({nd.data:f}), chd = {nd.nchd:d}, nprt = {nd.nprt:d}")
             cnt += 1
         return flat
 
@@ -307,11 +300,10 @@ class NLTreeNode:
         if self.type == "v":
             ix = int(self.data)
             if out >= 1:
-                print("Found variable %d" % (ix))
+                print(f"Found variable {ix:d}")
             if varnodes[ix] is None:
                 if out >= 1:
-                    print("Not registered yet:", end="")
-                    print(" now at %d" % (len(flat)))
+                    print(f"Not registered yet: now at {len(flat):d}")
                 varnodes[ix] = len(flat)
                 flat.append(self)
             else:
@@ -320,17 +312,15 @@ class NLTreeNode:
                 # registered one (and add a new parent). Also need to replace
                 # the node on the flat list
                 if out >= 1:
-                    print("var node %d already on flat tree at position %d" % (ix, varnodes[ix]))
+                    print(f"var node {ix:d} already on flat tree at position {varnodes[ix]:d}")
                 pos = varnodes[ix]
                 if out >= 1:
-                    print("flat[%d] is type = %s, ix = %d" % (pos,
-                                                              flat[pos].type,
-                                                              int(flat[pos].data)))
+                    print(f"flat[{pos:d}] is type = {flat[pos].type:s}, ix = {int(flat[pos].data):d}")
                 prnt_nd = self.parents[0]
                 # how do we know which child this is?
         else:
             flat.append(self)
-        # print("Called _add_node_to_flat. type = %s, nchd = %d"%(self.type, self.nchd))
+        # print(f"Called _add_node_to_flat. type = {self.type:s}, nchd = {self.nchd:d}")
 
         for i in range(self.nchd):
             chd = self.children[i]

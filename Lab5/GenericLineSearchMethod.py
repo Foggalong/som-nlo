@@ -78,19 +78,15 @@ def GLSM(x0, func, eps):
     tot_n_eval = 1
 
     if out == 2:
-        print("Initial x0 = ")
-        print(xk)
-        print("Initial f0 = ")
-        print(fk)
-        print("Initial g0 = ")
-        print(gk)
+        print(f"Initial x0 = {xk}")
+        print(f"Initial f0 = {fk}")
+        print(f"Initial g0 = {gk}")
 
     if out >= 1:
-        print("Start generic line search method: ", end="")
-        print("Line search = %s, Direction = %s" % (linesearch, direction))
+        print(f"Start generic line search method: Line search = {linesearch:s}, Direction = {direction:s}")
 
     if out >= 1:
-        print("it = %d: f = % 8.5g, |g| = % 8.5g" % (0, fk, LA.norm(gk)))
+        print(f"it = {0:d}: f = {fk:8.5g}, |g| = {LA.norm(gk):8.5g}")
 
     # set these for Conjugate Gradients
     dk_prev = None
@@ -136,7 +132,7 @@ def GLSM(x0, func, eps):
 
                 tau = -l_min+minEV
                 Hk = Hk + tau*np.eye(n)
-                print("Inertia correction: %f" % tau)
+                print("Inertia correction: {tau:f}")
                 #    print(Hk)
                 v, w = LA.eig(Hk)
                 print(v)
@@ -144,7 +140,7 @@ def GLSM(x0, func, eps):
             dk = - np.linalg.solve(Hk, gk)
             # check for too large direction
             if LA.norm(dk)>1e10:
-                print("Newton direction has size: %f" % LA.norm(dk))
+                print(f"Newton direction has size: {LA.norm(dk):f}")
                 print("Stop!")
                 raise Exception("Direction too large")
         elif direction == 'QN':
@@ -158,15 +154,14 @@ def GLSM(x0, func, eps):
 
         # check for descent direction
         if dk.dot(gk) >= 0:
+            print(f"dk = \n{dk}")
             print("search direction is not a descent direction: STOP")
-            print(dk)
             raise Exception("Not descent direction")
             dk = -gk
 
         # - - - - - - - - - -  do a line search - - - - - - - - - -
         if out > 1:
-            print("dk = ")
-            print(dk)
+            print(f"dk = \n{dk}")
 
         # counter for number of function evaluations in line search method
         n_eval = 0
@@ -190,7 +185,7 @@ def GLSM(x0, func, eps):
 
         tot_n_eval += n_eval
         if out >= 1:
-            print("Line search took "+str(n_eval)+" function evaluation")
+            print(f"Line search took {n_eval} function evaluation")
 
         # remember last xk for conjugate gradients and QN
         xk_prev = xk
@@ -209,16 +204,13 @@ def GLSM(x0, func, eps):
         iterate_list.append(np.array(xk))
 
         if out >= 1:
-            print("it=% 3d: f = % 8.5g, |g| = % 8.5g" %(iterations, fk, LA.norm(gk)));
+            print(f"it = {iterations:3d}: f = {fk:8.5g}, |g| = {LA.norm(gk):8.5g}")
         if out > 1:
-            print("xk=")
-            print(xk)
-            print("gk=")
-            print(gk)
+            print(f"xk = {xk}")
+            print(f"gk = {gk}")
 
     if out >= 2:
-        print("Hessian at sol:")
-        print(func(2, xk))
+        print(f"Hessian at sol:\n{func(2, xk)}")
 
-    print("GLSM took total of "+str(tot_n_eval)+" function evaluations")
+    print(f"GLSM took total of {tot_n_eval} function evaluations")
     return np.array(iterate_list)

@@ -21,7 +21,7 @@ def solveTRL2Cauchy(B, g, rho, ret_n_eval=False):
     """
 
     if out >= 1:
-        print("Called solveTRL2Cauchy with rho=%8.3g" % (rho))
+        print(f"Called solveTRL2Cauchy with rho={rho:8.3g}")
         if out >= 2:
             print(B)
             v, w = np.linalg.eig(B)
@@ -45,12 +45,12 @@ def solveTRL2Cauchy(B, g, rho, ret_n_eval=False):
             tau = stepsize
 
     if out >= 1:
-        print("tau = %f" % (tau))
+        print(f"tau = {tau:f}")
     dC = tau*rho/LA.norm(g)*dS
     mdC = 0.5*np.dot(dC, np.dot(B, dC)) + np.dot(g, dC)
     if out >= 1:
-        print("|dC| = %f" % (LA.norm(dC)))
-        print("mdC = %f" % (mdC))
+        print(f"|dC| = {LA.norm(dC):f}")
+        print(f"mdC = {mdC:f}")
 
     # Dog-leg method:
 
@@ -75,8 +75,8 @@ def solveTRL2Cauchy(B, g, rho, ret_n_eval=False):
         mdU = 0.5*np.dot(dU, np.dot(B, dU)) + np.dot(g, dU)
 
         if out >= 1:
-            print("|dU| = %f" % (LA.norm(dU)))
-            print("mdU = %f" % (mdU))
+            print(f"|dU| = {LA.norm(dU):f}")
+            print(f"mdU = {mdU:f}")
 
         # only consider the second leg of the dog-leg path if
         # the end point is outside the TR and leads to improvement
@@ -89,10 +89,8 @@ def solveTRL2Cauchy(B, g, rho, ret_n_eval=False):
         if (LA.norm(dU) > rho and mdU < mdC):
             # (4) find the minimizer along the dog-leg path
             if out >= 1:
-                print("dC = ", end="")
-                print(dC)
-                print("dU = ", end="")
-                print(dU)
+                print(f"dC = {dC}")
+                print(f"dU = {dU}")
 
             # solve (dC + lam*(dU-dC))'* (dC + lam*(dU-dC)) = rho^2
             # => dC'*dC + 2*lam*(dU-dC)'*dC + lam^2(dU-dC)'*(dU-dC) = rho^2
@@ -119,8 +117,8 @@ def solveTRL2Cauchy(B, g, rho, ret_n_eval=False):
             mdDL = 0.5*np.dot(dDL, np.dot(B, dDL)) + np.dot(g, dDL)
 
             if out >= 1:
-                print("|dDL| = %f" % (LA.norm(dDL)))
-                print("mdDL = %f" % (mdDL))
+                print(f"|dDL| = {LA.norm(dDL):f}")
+                print(f"mdDL = {mdDL:f}")
 
             if np.abs(LA.norm(dDL)-rho) > 1e-4:
                 print("dDL not on TR boundary")

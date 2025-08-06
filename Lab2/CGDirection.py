@@ -33,6 +33,5 @@ def CGDirection(gkp, gk, pk):
 
     pkp = -gkp + bkp*pk
 
-    print("pkp = ")
-    print(pkp)
+    print(f"pkp = \n{pkp}")
     return pkp

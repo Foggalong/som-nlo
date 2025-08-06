@@ -68,7 +68,7 @@ def ded(ord, x):
                 r[j] = r0 + c1*math.exp(-l1*tj) + c2*math.exp(-l2*tj) - pj
             except OverflowError:
                 print("Overflow in evaluation of NLS residual for")
-                print("l1 = %g, l2 = %g" % (l1, l2))
+                print(f"l1 = {l1:g}, l2 = {l2:g}")
                 print("Cannot evaluate exp() - function")
                 raise Exception("Overflow")
         return r

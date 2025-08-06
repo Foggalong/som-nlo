@@ -72,7 +72,7 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
         # if fn < f00 and gn>0 we are done
         # if fn > f00 we need to get to smaller values
         if out == 1:
-            print("alpha = "+str(alpha))
+            print(f"alpha = {alpha}")
         if fn < f00:
             if gn > 0:
                 if out == 1:
@@ -114,9 +114,9 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
     # we should now be at a position where the exact alpha is between al and au
     # report progress
     if out == 1:
-        print("after step 1: al = % 8.5f, au= % 8.5f" % (al, au))
-        print("f0 = "+str(f00)+", f(al) = "+str(f0)+", f(au) = "+str(f1))
-        print("g(al) = "+str(g0)+", g(au) = "+str(g1))
+        print(f"after step 1: al = {al:8.5f}, au= {au:8.5f}")
+        print(f"f0 = {f00}, f(al) = {f0}, f(au) = {f1}")
+        print(f"g(al) = {g0}, g(au) = {g1}")
 
     # - - - - - - step 2 - - - - - - -
     # At this point we have an interval al, au with
@@ -136,7 +136,7 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
         n_eval = n_eval + 1
 
         if out == 1:
-            print("am= % 8.5f, slope = % 8.5f" % (am, gn))
+            print(f"am = {am:8.5f}, slope = {gn:8.5f}")
 
         if gn > 0:
             au = am
@@ -148,7 +148,7 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
             gl = gn
 
         if out == 1:
-            print("new interval: al = % 8.5f, au= % 8.5f" % (al, au))
+            print(f"new interval: al = {al:8.5f}, au = {au:8.5f}")
 
     if fn > f00:
         raise ValueError("We do not have decrease, this should not happen!")

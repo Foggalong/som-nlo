@@ -80,14 +80,10 @@ class L2Penalty:
             c = nlp.cons(x)
             jac = nlp.jac(x)
             if out >= 1:
-                print("x = ")
-                print(x)
-                print("df = ")
-                print(df)
-                print("c = ")
-                print(c)
-                print("jac = ")
-                print(jac)
+                print(f"x = \n{x}")
+                print(f"df = \n{df}")
+                print(f"c = \n{c}")
+                print(f"jac = \n{jac}")
 
             for i in range(nlp.n_con):
                 if c[i] < nlp.cl[i]:
@@ -102,8 +98,7 @@ class L2Penalty:
                     df[i] = df[i] + fact*(x[i]-nlp.bu[i])
 
             if out >= 1:
-                print("df = ")
-                print(df)
+                print(f"df = \n{df}")
 
             return df
 

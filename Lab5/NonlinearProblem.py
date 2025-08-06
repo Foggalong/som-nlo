@@ -92,8 +92,7 @@ class NonlinearProblem:
         l1 = f.readline()
 
         if out >= 1:
-            print("Defining nonlinear problem with ", end="")
-            print("nvar = %d, ncon = %d" % (self.nvar, self.ncon))
+            print(f"Defining nonlinear problem with nvar = {self.nvar:d}, ncon = {self.ncon:d}")
 
         # - - - - - - - - -  end of reading header - - - - - - -
 
@@ -121,8 +120,7 @@ class NonlinearProblem:
                     l1 = f.readline()
                     self.bl[i], self.bu[i] = self.setBoundsFromLine(l1)
                     if out >= 2:
-                        print("Set bounds var %d: %g %g" % (i, self.bl[i],
-                                                            self.bu[i]))
+                        print(f"Set bounds var {i:d}: {self.bl[i]:g} {self.bu[i]:g}")
             elif line[0] == 'r':
                 # read the r-section: table 17: bounds on constraints
 
@@ -130,9 +128,8 @@ class NonlinearProblem:
                     l1 = f.readline()
                     self.cl[i], self.cu[i] = self.setBoundsFromLine(l1)
                     if out >= 2:
-                        print("Set bounds con %d: %g %g" % (i, self.cl[i],
-                                                            self.cu[i]))
-            elif line[0]== 'k':
+                        print(f"Set bounds con {i:d}: {self.cl[i]:g} {self.cu[i]:g}")
+            elif line[0] == 'k':
                 # read the k-section: table 19/20: columns pointers for J
                 self.colpts = []
                 npts = int(line[1:])
@@ -142,21 +139,20 @@ class NonlinearProblem:
                     l1 = f.readline()
                     self.colpts.append(int(l1))
                 if out >= 2:
-                    print("Column pointers are ", end="")
-                    print(np.array(self.colpts))
+                    print(f"Column pointers are {np.array(self.colpts)}")
             elif line[0] == 'C':
                 tok = line.split()
                 nc = int(tok[0][1:])
                 if out >= 2:
-                    print("Defining constraint %d" % (nc))
+                    print(f"Defining constraint {nc:d}")
                 cnd = self.readExpressionTree(self, f)
                 self.constraints.append(cnd)
-                
+
             elif line[0] == 'O':
                 tok = line.split()
                 nc = int(tok[0][1:])
                 if out >= 2:
-                    print("Defining objective %d" % (nc))
+                    print(f"Defining objective {nc:d}")
                 self.sense = 1  # by default minimize
                 if int(tok[1]) == 1:
                     self.sense = -1
@@ -166,7 +162,7 @@ class NonlinearProblem:
                 tok = line.split()
                 nj = int(tok[0][1:])
                 if out >= 2:
-                    print("Reading J (Jacobian) section: constraint %d" % (nj))
+                    print(f"Reading J (Jacobian) section: constraint {nj:d}")
                 cnt = int(tok[1])
                 for i in range(cnt):
                     l1 = f.readline()
@@ -179,7 +175,7 @@ class NonlinearProblem:
                 ng = int(tok[0][1:])
                 cnt = int(tok[1])
                 if out >= 2:
-                    print("Reading G (objective gradient) section: objective %d" % (ng))
+                    print(f"Reading G (objective gradient) section: objective {ng:d}")
                 for i in range(cnt):
                     l1 = f.readline()
                     tok1 = l1.split()
@@ -188,20 +184,18 @@ class NonlinearProblem:
                     self.glin[ix] = nty
 
         if out >= 2:
-            print("J = ", end="")
-            print(self.Jlin)
-            print("G = ", end="")
-            print(self.glin)
+            print(f"J = {self.Jlin}")
+            print(f"G = {self.glin}")
 
         f.close()
 
         self.objflat = self.objective[0].get_flat_tree(self.nvar)
         if out >= 2:
-            print("nodes in flat obj tree: %d" % (len(self.objflat)))
+            print(f"nodes in flat obj tree: {len(self.objflat):d}")
 
         self.consflat = self.constraints[0].get_flat_tree(self.nvar)
         if out >= 2:
-            print("nodes in flat cons[0] tree: %d" % (len(self.consflat)))
+            print(f"nodes in flat cons[0] tree: {len(self.consflat):d}")
 
         self.mode = mode
         self.orignvar = self.nvar
@@ -209,13 +203,12 @@ class NonlinearProblem:
             # set up the transformation into an equality constrained
             # problem with simple bounds
             # 1) id inequality constraints
-            
+
             iseq = np.abs(self.cu-self.cl) < 1e-8
             self.isineq = ~iseq
             self.nineq = np.count_nonzero(self.isineq)
-            print("isineq = ", end="")
-            print(self.isineq)
-            print("nineq = %d" % (self.nineq))
+            print(f"isineq = {self.isineq}")
+            print(f"nineq = {self.nineq:d}")
             self.cntineq = -1*np.ones(self.ncon)
             self.pineq = -1*np.ones(self.nineq)
             cnt = 0
@@ -251,16 +244,14 @@ class NonlinearProblem:
 
             # - - - - -  print the changed problem - - -
             for i in range(self.orignvar):
-                print("orig bl/bu[%d]: %f   %f" % (i, self.origbl[i],
-                                                   self.origbu[i]))
+                print(f"orig bl/bu[{i:d}]: {self.origbl[i]:f}   {self.origbu[i]:f}")
             for i in range(self.ncon):
-                print("orig cl/cu[%d]: %f   %f" % (i, self.origcl[i],
-                                                   self.origcu[i]))
+                print(f"orig cl/cu[{i:d}]: {self.origcl[i]:f}   {self.origcu[i]:f}")
 
             for i in range(self.nvar):
-                print("bl/bu[%d]: %f   %f" % (i, self.bl[i], self.bu[i]))
+                print(f"bl/bu[{i:d}]: {self.bl[i]:f}   {self.bu[i]:f}")
             for i in range(self.ncon):
-                print("cl/cu[%d]: %f   %f" % (i, self.cl[i], self.cu[i]))
+                print(f"cl/cu[{i:d}]: {self.cl[i]:f}   {self.cu[i]:f}")
 
     # - - - - - - - - - - - -  setBoundsFromLine - - - - - - - - -
 
@@ -286,7 +277,7 @@ class NonlinearProblem:
             # "body complements variable"
             raise ValueError("bounds type 5 not implemented")
         else:
-            raise ValueError("unknown bound type:\n %s" % tok[0])
+            raise ValueError(f"unknown bound type:\n {tok[0]:s}")
 
         return bl, bu
 
@@ -311,7 +302,7 @@ class NonlinearProblem:
 
         if c == 'o':
             if out >= 2:
-                print("Level %d: operand: " % (level), end="")
+                print(f"Level {level:d}: operand:", end="")
             tok = line.split()
             op = int(tok[0][1:])
             if op == 0:
@@ -415,19 +406,19 @@ class NonlinearProblem:
                     ci = self._readExpressionTree(self, f, level+1)
                     nd.add_chd(ci)
             else:
-                raise ValueError("Operator not implemented yet: %d" % (op))
+                raise ValueError(f"Operator not implemented yet: {op:d}")
 
         elif c == 'n':
             tok = line.split()
             const = float(tok[0][1:])
             if out >= 2:
-                print("Level %d: number: %f" % (level, const))
+                print(f"Level {level:d}: number: {const:f}")
             nd = nlt.NLTreeNode("n", const)
         elif c == 'v':
             tok = line.split()
             ix = int(tok[0][1:])
             if out >= 2:
-                print("Level %d: variable: %d" % (level, ix))
+                print(f"Level {level:d}: variable: {ix:d}")
             if self.varnodes[ix] == None:
                 if out >= 2:
                     print("Not registered yet")
@@ -444,14 +435,13 @@ class NonlinearProblem:
 
     def eval_objective(self, x):
         # print(self.objective[0].to_string())
-        # print("self.glin[0] = ",end="")
-        # print(self.glin)
+        # print(f"self.glin[0] = {self.glin}")
         return self.objective[0].eval_val(x)+np.dot(self.glin,
                                                     x[0:self.orignvar])
 
     def eval_constraint(self, nc, x):
         if out >= 2:
-            print("eval cons[%d]: %s" % (nc, self.constraints[nc].to_string()))
+            print(f"eval cons[{nc:d}]: {self.constraints[nc].to_string():s}")
 
         csbdy = self.constraints[nc].eval_val(x)+np.dot(self.Jlin[nc, :],
                                                         x[0:self.orignvar])
@@ -465,21 +455,18 @@ class NonlinearProblem:
 
     def eval_objgrad(self, x):
         if out >= 2:
-            print("eval objgrad: %s" % (self.objective[0].to_string()))
+            print(f"eval objgrad: {self.objective[0].to_string():s}")
         val, gd = self.objective[0].eval_grad_forwardADTree(x)
-        # print("self.glin = ",end="")
-        # print(self.glin)
+        # print(f"self.glin[0] = {self.glin}")
         gd[0:self.orignvar] = gd[0:self.orignvar]+self.glin
         return gd
 
     def eval_consgrad(self, nc, x):
         if out >= 2:
-            print("eval_consgrad[%d]: %s" % (nc,
-                                             self.constraints[nc].to_string()))
+            print(f"eval_consgrad[{nc:d}]: {self.constraints[nc].to_string():s}")
         val, gd = self.constraints[nc].eval_grad_forwardADTree(x)
         if out >= 2:
-            print("self.Jlin[nc,:] = ", end="")
-            print(self.Jlin[nc, :])
+            print(f"self.Jlin[nc,:] = {self.Jlin[nc, :]}")
 
         gd[0:self.orignvar] = gd[0:self.orignvar]+self.Jlin[nc, :]
 
@@ -492,7 +479,7 @@ class NonlinearProblem:
 
     def eval_objhess(self, x):
         if out >= 1:
-            print("eval_objhess: %s"%(self.objective[0].to_string()))
+            print(f"eval_objhess: {self.objective[0].to_string():s}")
         val, gd, H = self.objective[0].eval_hess_forwardADTree(x)
 
         # if self.mode=="EqBnd":
@@ -505,7 +492,7 @@ class NonlinearProblem:
 
     def eval_conshess(self, nc, x):
         if out >= 1:
-            print("eval_conshess[%d]: %s"%(nc, self.constraints[nc].to_string()))
+            print(f"eval_conshess[{nc:d}]: {self.constraints[nc].to_string():s}")
         val, gd, H = self.constraints[nc].eval_hess_forwardADTree(x)
         # if self.mode=="EqBnd":
         #     H2 = np.zeros((self.nvar,self.nvar))

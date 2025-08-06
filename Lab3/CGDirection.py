@@ -48,6 +48,5 @@ def CGDirection(gkp, gk, pk):
             print("CG: not a descent direction")
             pkp = -gkp
 
-    # print("pkp = ")
-    # print(pkp)
+    # print(f"pkp = \n{pkp}")
     return pkp

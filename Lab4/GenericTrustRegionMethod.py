@@ -72,15 +72,12 @@ def GTRM(x0, func, eps):
     tot_solves = 0
 
     if out >= 3:
-        print("Initial x0=")
-        print(xk)
-        print("Initial f(x0)=")
-        print(fk)
-        print("Initial g(x0)=")
-        print(gk)
+        print(f"Initial x0=\n{xk}")
+        print(f"Initial f(x0)=\n{fk}")
+        print(f"Initial g(x0)=\n{gk}")
 
     if out >= 1:
-        print("it=  0: f = % 8.5g, |g| = % 8.3g" % (fk, LA.norm(gk)))
+        print(f"it=  0: f = {fk:8.5g}, |g| = {LA.norm(gk):8.3g}")
 
     rho = r0
     iterations = 0
@@ -100,12 +97,11 @@ def GTRM(x0, func, eps):
             raise ValueError("Direction code not recognized")
 
         if out >= 2:
-            print("TR subproblem takes %d solves" % (n_solves))
+            print(f"TR subproblem takes {n_solves:d} solves")
         tot_solves = tot_solves + n_solves
 
         if out >= 3:
-            print("dk = ")
-            print(dk)
+            print(f"dk = {dk}")
 
         # - - - - - - - - - -  do the TR logic - - - - - - - - - - -
 
@@ -118,13 +114,13 @@ def GTRM(x0, func, eps):
         # actual decrease = f(xk) - f(xkp)
         actual_dec = fk - fkp
         if out >= 2:
-            print("  pred dec = %8.5f" % pred_dec)
-            print("  actu dec = %8.5f" % actual_dec)
+            print(f"  pred dec = {pred_dec:8.5f}")
+            print(f"  actu dec = {actual_dec:8.5f}")
 
         # delta to predicted/actual
         delta = actual_dec/pred_dec
         if out >= 2:
-            print("  -> delta = %8.5f" % delta)
+            print(f"  -> delta = {delta:8.5f}")
 
         # do the actual trust region logic
         if delta > del_up:
@@ -134,8 +130,7 @@ def GTRM(x0, func, eps):
             if np.abs(LA.norm(dk)-rho)/rho < 0.1:
                 rho = fact_inc*rho
             if out >= 2:
-                print("  ->accept step and increase rho = ", end="")
-                print(rho)
+                print(f"  ->accept step and increase rho = {rho}")
         elif delta > del_lo:
             # accept step but leave TR radius as it was
             xkn = xkp
@@ -147,8 +142,7 @@ def GTRM(x0, func, eps):
             xkn = xk
             rho = fact_dec*rho
             if out >= 2:
-                print("  ->reject step and decrease rho = ", end="")
-                print(rho)
+                print(f"  ->reject step and decrease rho = {rho}")
 
         # take whatever step was decided
         xk = xkn
@@ -160,15 +154,13 @@ def GTRM(x0, func, eps):
         iterations_list.append(np.array(xk))
 
         if out >= 1:
-            print("it=% 3d: f = % 8.5g, |g| = %8.3g" % (iterations, fk, LA.norm(gk)), end="")
-            print(", rho=%8.3g, n_solves = %3d" % (rho, n_solves))
+            print(f"it={iterations:3d}: f = {fk:8.5g}, |g| = {LA.norm(gk):8.3g}")
+            print(f", rho={rho:8.3g}, n_solves = {n_solves:3d}")
         if out >= 3:
-            print("xk=")
-            print(xk)
-            print("gk=")
-            print(gk)
+            print(f"xk={xk}")
+            print(f"gk={gk}")
 
-    print("GTRM took total of "+str(tot_f_eval)+" function evaluations")
-    print("GTRM took total of "+str(tot_g_eval)+" gradient evaluations")
-    print("GTRM took total of "+str(tot_solves)+" solves in TR subproblem")
+    print(f"GTRM took total of {tot_f_eval} function evaluations")
+    print(f"GTRM took total of {tot_g_eval} gradient evaluations")
+    print(f"GTRM took total of {tot_solves} solves in TR subproblem")
     return np.array(iterations_list)
