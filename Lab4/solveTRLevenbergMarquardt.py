@@ -41,7 +41,7 @@ def solveTRLM(B, g, rho, tol, ret_n_eval=False):
     #         L = LA.cholesky(B+lam*eye(n))
     #         isPosDef = True
     #     except:
-    #         lam = lam + 1
+    #         lam += 1
 
     # if we get here we should have that B+lam*I is pos def
 
@@ -49,7 +49,7 @@ def solveTRLM(B, g, rho, tol, ret_n_eval=False):
     isPosDef = True
     try:
         L = LA.cholesky(B)
-        n_eval = n_eval + 1
+        n_eval += 1
         if out >= 1:
             print("  initial lam=0 results in pd matrix")
     except:
@@ -85,7 +85,7 @@ def solveTRLM(B, g, rho, tol, ret_n_eval=False):
     # new_lam = 0
 
     while (np.abs(norm_dk-rho)/rho > tol) and (iterations < max_iterations):
-        iterations = iterations + 1
+        iterations += 1
         if lam_up > 1e10:
             lam = max(2*lam, 1)
             if out >= 1:
@@ -107,7 +107,7 @@ def solveTRLM(B, g, rho, tol, ret_n_eval=False):
             L = LA.cholesky(B+lam*np.eye(n))
         except:
             isPosDef = False
-        n_eval = n_eval + 1
+        n_eval += 1
 
         if not isPosDef:
             if out >= 1:

@@ -47,7 +47,7 @@ def solveLP(c, A, bl, bu, cl, cu):
     n_ineq = 0
     for j in range(m):
         if np.abs(bu[j]-bl[j])>1e-8:
-            n_ineq = n_ineq + 1
+            n_ineq += 1
 
     # set up a matrix S for slacks (Ax - Ss = 0). Also vectors to hold
     # - bounds for s: scl, scu
@@ -64,7 +64,7 @@ def solveLP(c, A, bl, bu, cl, cu):
             scl[cnt] = bl[j]
             scu[cnt] = bu[j]
             newb[j] = 0.0
-            cnt = cnt + 1
+            cnt += 1
 
     # now we can rewrite bl <= A*x <= bu, cl<=x<=cu as
     #    [A -S]*[x;s] = newb, scl<=s<=scu, cl<=x<=cu
@@ -123,13 +123,13 @@ def solveLP(c, A, bl, bu, cl, cu):
 # active = []
 # for i in range(n):
 #     if np.abs(res.x[i]-cl[i])<1e-6 or np.abs(res.x[i]-cu[i])<1e-6:
-#         natbnd = natbnd + 1
+#         natbnd += 1
 #         active.append(True)
 #     else:
 #         active.append(False)
 # for i in range(n_ineq):
 #     if np.abs(res.x[n+i]-scl[i])<1e-6 or np.abs(res.x[n+i]-scu[i])<1e-6:
-#         natbnd = natbnd + 1
+#         natbnd += 1
 #         active.append(True)
 #     else:
 #         active.append(False)

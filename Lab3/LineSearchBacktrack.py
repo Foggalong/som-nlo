@@ -24,7 +24,7 @@ def LineSearchBacktrack(xk, d, c1, func, ret_n_eval=False):
     n_eval = 0
     f0 = func(0, xk)  # initial value
     g0 = func(1, xk).dot(d)  # initial slope
-    n_eval = n_eval + 1
+    n_eval += 1
 
     if out > 1:
         print(f"f0 = {f0}")
@@ -34,7 +34,7 @@ def LineSearchBacktrack(xk, d, c1, func, ret_n_eval=False):
 
     # evaluate function value at xk+alpha*d
     f1 = func(0, xk+alpha*d)
-    n_eval + n_eval + 1
+    n_eval += 1
 
     if out == 1:
         print(f"al= {alpha:8.5f}, reduction= {f0-f1:8.5f}, required= {-c1*alpha*g0:8.5f}")
@@ -44,7 +44,7 @@ def LineSearchBacktrack(xk, d, c1, func, ret_n_eval=False):
         # reduce alpha and evaluate function at new point
         alpha = alpha*tau
         f1 = func(0, xk+alpha*d)
-        n_eval = n_eval + 1
+        n_eval += 1
 
         # report progress
         if out == 1:

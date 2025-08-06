@@ -9,9 +9,9 @@ def eval_cviol(nlp, c):
     h = 0.0
     for j in range(nlp.ncon):
         if c[j] > nlp.cu[j]:
-            h = h + (c[j] - nlp.cu[j])
+            h += (c[j] - nlp.cu[j])
         if c[j] < nlp.cl[j]:
-            h = h + (nlp.cl[j] - c[j])
+            h += (nlp.cl[j] - c[j])
     return h
 
 

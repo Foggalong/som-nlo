@@ -71,7 +71,7 @@ def solveTRL2Cauchy(B, g, rho, ret_n_eval=False):
                 print("Cannot solve for dU")
             dU = np.zeros(n)
 
-        n_eval = n_eval + 1
+        n_eval += 1
         mdU = 0.5*np.dot(dU, np.dot(B, dU)) + np.dot(g, dU)
 
         if out >= 1:

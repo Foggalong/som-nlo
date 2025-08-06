@@ -60,5 +60,5 @@ def nls(ord, x):
         H = np.dot(J.transpose(), J)
         if (not use_GN):
             for j in range(nJ):
-                H = H + r[j]*ddr[j]
+                H += r[j]*ddr[j]
         return H

@@ -67,7 +67,7 @@ def chebyquad(ord, x):
         # => d/dx_i f(x) = sum_k 2f_k(x) d/dxi f(k)
         g = np.zeros(n)
         for k in range(n):
-            g = g + 2*fvec[k]*J[k]
+            g += 2*fvec[k]*J[k]
         return g
 
     elif ord == 2:
@@ -105,13 +105,13 @@ def chebyquad(ord, x):
                 p1 = p2
                 p2 = th
                 gvec[i] = s2
-                hesd[j] = hesd[j] + fvec[i]*th + d1*s2**2
-                H[j][j] = H[j][j] + fvec[i]*th + d1*s2**2
+                hesd[j] += fvec[i]*th + d1*s2**2
+                H[j][j] += fvec[i]*th + d1*s2**2
 
             hesd[j] = d2*hesd[j]
             H[j][j] = d2*H[j][j]
             for k in range(j):
-                im = im + 1
+                im += 1
                 hesl[im] = 0
                 H[k][j] = 0  # ??
                 H[j][k] = 0  # ??
@@ -121,9 +121,9 @@ def chebyquad(ord, x):
                 ss1 = 0
                 ss2 = 2
                 for i in range(n):
-                    hesl[im] = hesl[im] + ss2*gvec[i]
-                    H[k][j] = H[k][j] + ss2*gvec[i]
-                    H[j][k] = H[j][k] + ss2*gvec[i]
+                    hesl[im] += ss2*gvec[i]
+                    H[k][j] += ss2*gvec[i]
+                    H[j][k] += ss2*gvec[i]
                     tth = 4*tt2 + tt*ss2 - ss1
                     ss1 = ss2
                     ss2 = tth
@@ -150,7 +150,7 @@ def get_fvec(x):
         temp2 = 2*x[j] - 1   # T1 (or T_n or y)
         temp = 2*temp2       # 2*T_n(x)
         for i in range(n):
-            fvec[i] = fvec[i] + temp2
+            fvec[i] += temp2
             ti = temp*temp2 - temp1   # T_{n+1} =
             temp1 = temp2
             temp2 = ti
@@ -160,7 +160,7 @@ def get_fvec(x):
     for k in range(n):
         fvec[k] = tk*fvec[k]
         if (iev > 0):  # if i is even
-            fvec[k] = fvec[k] + 1./((k+1)**2 - 1)
+            fvec[k] += 1./((k+1)**2 - 1)
         iev = -iev
 
     return fvec
@@ -182,7 +182,7 @@ def hesdl2H(hesd, hesl):
     for i in range(1, n):
         H[i][1:i-1] = hesl[k1:k2]
         H[1:i-1][i] = hesl[k1:k2]
-        kc = kc + 1
+        kc += 1
         k1 = k2 + 1
         k2 = k1 + kc - 1
 

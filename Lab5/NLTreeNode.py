@@ -22,12 +22,12 @@ class NLTreeNode:
     #  self.parents = parents
 
     def add_chd(self, chd):
-        self.nchd = self.nchd + 1
+        self.nchd += 1
         self.children.append(chd)
         chd.add_prt(self)
 
     def add_prt(self, prt):
-        self.nprt = self.nprt + 1
+        self.nprt += 1
         self.parents.append(prt)
 
     def set_data(self, data):
@@ -144,7 +144,7 @@ class NLTreeNode:
             val = f1**f2
             gd = f2*(f1**(f2-1))*g1
             if np.linalg.norm(g2-np.zeros(n)) > 1e-6:
-                gd = gd + (f1**f2)*np.log(f1)*g2
+                gd += (f1**f2)*np.log(f1)*g2
             # print(val, gd)
             return (val, gd)
         elif self.type == "sum":
@@ -216,7 +216,7 @@ class NLTreeNode:
             val = f1**f2
             gd = f2*(f1**(f2-1))*g1
             if np.linalg.norm(g2-np.zeros(n)) > 1e-6:
-                gd = gd + (f1**f2)*np.log(f1)*g2
+                gd += (f1**f2)*np.log(f1)*g2
             print(val, gd)
             Hr = f2*(f1**(f2-2))*(f1*H1 + (f2-1)*np.outer(g1, g1))
             if np.linalg.norm(g2-np.zeros(n)) > 1e-6:

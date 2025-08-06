@@ -50,7 +50,7 @@ def sourceloc(ord, x, y=None):
         val = 0
         for i in range(m):
             norm = np.sqrt((s[i][0]-x1)**2 + (s[i][1]-x2)**2)
-            val = val + (norm - r[i])**2
+            val += (norm - r[i])**2
         return 0.5*val
     elif ord == 1:
         # gradient value is required
@@ -58,7 +58,7 @@ def sourceloc(ord, x, y=None):
         for i in range(m):
             norm = np.sqrt((s[i][0]-x1)**2 + (s[i][1]-x2)**2)
             fact = 1-r[i]/norm
-            val = val + fact*np.array([x1-s[i][0], x2-s[i][1]])
+            val += fact*np.array([x1-s[i][0], x2-s[i][1]])
         return val
     elif ord == 2:
         # hessian value is required
@@ -68,11 +68,11 @@ def sourceloc(ord, x, y=None):
             norm = np.sqrt((s[i][0]-x1)**2 + (s[i][1]-x2)**2)
             fact = r[i]/(norm**3)
             tau = tau - r[i]/norm
-            H = H + fact*np.array([
+            H += fact*np.array([
                 [(x1-s[i][0])**2, (x1-s[i][0])*(x2-s[i][1])],
                 [(x1-s[i][0])*(x2-s[i][1]), (x2-s[i][1])**2]])
 
-        H = H + tau*np.array([[1, 0], [0, 1]])
+        H += tau*np.array([[1, 0], [0, 1]])
         return H
     else:
         raise ValueError("first argument must be 0, 1 or 2.")

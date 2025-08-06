@@ -45,7 +45,7 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
     fl = func(0, xk)    # initial value
     f00 = fl  # remember the function value at alpha = 0
     gl = func(1, xk).dot(d)  # initial slope
-    n_eval = n_eval + 1
+    n_eval += 1
     # The f and gg values at alpha = 0 are the first values at al
     # => label them as fl, gl
 
@@ -60,7 +60,7 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
     # evaluate f and g at the next trial point alpha => fn(ew), gn(ew)
     fn = func(0, xk+alpha*d)  # function value
     gn = func(1, xk+alpha*d).dot(d)  # slope
-    n_eval = n_eval + 1
+    n_eval += 1
     # print(func(1, xk+au*d))
     # print(d)
     # print(gn)
@@ -106,7 +106,7 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
 
         fn = func(0, xk+alpha*d)
         gn = func(1, xk+alpha*d).dot(d)
-        n_eval = n_eval + 1
+        n_eval += 1
 
     au = alpha
     # we should now be at a position where the exact alpha is between al and au
@@ -129,7 +129,7 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
         # get f and g an the new trial point
         fn = func(0, xk+am*d)
         gn = func(1, xk+am*d).dot(d)
-        n_eval = n_eval + 1
+        n_eval += 1
 
         if out == 1:
             print(f"am = {am:8.5f}, slope = {gn:8.5f}")

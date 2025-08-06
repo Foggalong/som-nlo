@@ -60,15 +60,15 @@ class L2Penalty:
             c = nlp.cons(x)
             for i in range(nlp.n_con):
                 if c[i] < nlp.cl[i]:
-                    f = f + 0.5*fact*(nlp.cl[i] - c[i])**2
+                    f += 0.5*fact*(nlp.cl[i] - c[i])**2
                 if c[i] > nlp.cu[i]:
-                    f = f + 0.5*fact*(c[i] - nlp.cu[i])**2
+                    f += 0.5*fact*(c[i] - nlp.cu[i])**2
 
             for i in range(nlp.n_var):
                 if x[i] < nlp.bl[i]:
-                    f = f + 0.5*fact*(nlp.bl[i] - x[i])**2
+                    f += 0.5*fact*(nlp.bl[i] - x[i])**2
                 if x[i] > nlp.bu[i]:
-                    f = f + 0.5*fact*(x[i] - nlp.bu[i])**2
+                    f += 0.5*fact*(x[i] - nlp.bu[i])**2
 
             return f
 
@@ -87,15 +87,15 @@ class L2Penalty:
 
             for i in range(nlp.n_con):
                 if c[i] < nlp.cl[i]:
-                    df = df - fact*(nlp.cl[i]-c[i])*jac[:, i]
+                    df -= fact*(nlp.cl[i]-c[i])*jac[:, i]
                 if c[i] > nlp.cu[i]:
-                    df = df + fact*(c[i]-nlp.cu[i])*jac[:, i]
+                    df += fact*(c[i]-nlp.cu[i])*jac[:, i]
 
             for i in range(nlp.n_var):
                 if x[i] < nlp.bl[i]:
-                    df[i] = df[i] - fact*(nlp.bl[i]-x[i])
+                    df[i] -= fact*(nlp.bl[i]-x[i])
                 if x[i] > nlp.bu[i]:
-                    df[i] = df[i] + fact*(x[i]-nlp.bu[i])
+                    df[i] += fact*(x[i]-nlp.bu[i])
 
             if out >= 1:
                 print(f"df = \n{df}")
@@ -119,18 +119,18 @@ class L2Penalty:
                 lam[i] = 1.0
                 Hi = nlp.hess(x, lam) - H0
                 if c[i] < nlp.cl[i]:
-                    H = H + fact*((nlp.cl[i]-c[i])*Hi + np.outer(J0[:, i],
-                                                                 J0[:, i]))
+                    H += fact*((nlp.cl[i]-c[i])*Hi + np.outer(J0[:, i],
+                                                              J0[:, i]))
                 if c[i] > nlp.cu[i]:
-                    H = H + fact*((c[i]-nlp.cu[i])*Hi + np.outer(J0[:, i],
-                                                                 J0[:, i]))
+                    H += fact*((c[i]-nlp.cu[i])*Hi + np.outer(J0[:, i],
+                                                              J0[:, i]))
                 lam[i] = 0.0
 
             for i in range(nlp.n_var):
                 if x[i] < nlp.bl[i]:
-                    H[i, i] = H[i, i] + 1.0*fact
+                    H[i, i] += 1.0*fact
                 if x[i] > nlp.bu[i]:
-                    H[i, i] = H[i, i] + 1.0*fact
+                    H[i, i] += 1.0*fact
 
             return H
         else:

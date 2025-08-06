@@ -95,7 +95,7 @@ def GLSM(x0, func, eps):
 
     iterations = 0
     while (LA.norm(gk) >= eps and iterations < max_iter):
-        iterations = iterations + 1
+        iterations += 1
 
         # - - - - - - - - - find search directions - - - - - - - - - -
 
@@ -129,9 +129,9 @@ def GLSM(x0, func, eps):
                 # print((val, L))
 
                 tau = -l_min+minEV
-                Hk = Hk + tau*np.eye(n)
+                Hk += tau*np.eye(n)
                 print(f"Inertia correction: {tau:f}")
-            #    print(Hk)
+                # print(Hk)
                 v, w = LA.eig(Hk)
                 print(v)
 
@@ -188,7 +188,7 @@ def GLSM(x0, func, eps):
         xk_prev = xk
 
         # take step
-        xk = xk + alpha*dk
+        xk += alpha*dk
 
         # remember last dk and gk for conjugate gradients and QN
         gk_prev = gk
@@ -196,7 +196,7 @@ def GLSM(x0, func, eps):
 
         fk = func(0, xk)
         gk = func(1, xk)
-        tot_n_eval = tot_n_eval + 1
+        tot_n_eval += 1
 
         iterate_list.append(np.array(xk))
 

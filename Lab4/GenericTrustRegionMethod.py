@@ -82,7 +82,7 @@ def GTRM(x0, func, eps):
     rho = r0
     iterations = 0
     while (LA.norm(gk) >= eps and iterations < iterations):
-        iterations = iterations + 1
+        iterations += 1
 
         # - - - - - - - - - solve TR subproblem - - - - - - - - - -
         # define the TR model: m(d) = 0.5*d*H*d + b'*d
@@ -98,7 +98,7 @@ def GTRM(x0, func, eps):
 
         if out >= 2:
             print(f"TR subproblem takes {n_solves:d} solves")
-        tot_solves = tot_solves + n_solves
+        tot_solves += n_solves
 
         if out >= 3:
             print(f"dk = {dk}")
@@ -107,7 +107,7 @@ def GTRM(x0, func, eps):
 
         xkp = xk+dk
         fkp = func(0, xkp)
-        tot_f_eval = tot_f_eval + 1
+        tot_f_eval +=  1
 
         # predicted decrease = m(0) - m(dk) =
         pred_dec = -(0.5*np.dot(dk, np.dot(B, dk)) + np.dot(g, dk))
@@ -126,7 +126,7 @@ def GTRM(x0, func, eps):
         if delta > del_up:
             # accept step and increase TR radius
             xkn = xkp
-            tot_g_eval = tot_g_eval + 1
+            tot_g_eval += 1
             if np.abs(LA.norm(dk)-rho)/rho < 0.1:
                 rho = fact_inc*rho
             if out >= 2:
@@ -134,7 +134,7 @@ def GTRM(x0, func, eps):
         elif delta > del_lo:
             # accept step but leave TR radius as it was
             xkn = xkp
-            tot_g_eval = tot_g_eval + 1
+            tot_g_eval += 1
             if out >= 2:
                 print("  ->accept step and leave rho unchanged")
         else:

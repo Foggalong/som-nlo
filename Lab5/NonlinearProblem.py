@@ -223,7 +223,7 @@ class NonlinearProblem:
 
             # now relabel presented size of problem
             self.orignvar = self.nvar
-            self.nvar = self.nvar + self.nineq
+            self.nvar += self.nineq
             self.origcl = self.cl.copy()
             self.origcu = self.cu.copy()
             self.origbl = self.bl
@@ -450,7 +450,7 @@ class NonlinearProblem:
             # print("Called eval_cons in EqBnd mode")
             if self.isineq[nc]:
                 ixsi = self.orignvar + int(self.cntineq[nc])
-                csbdy = csbdy - x[ixsi]
+                csbdy -= x[ixsi]
         return csbdy
 
     def eval_objgrad(self, x):
@@ -506,7 +506,7 @@ class NonlinearProblem:
         val, gd, H = self.objective[0].eval_hess_forwardADTree(x)
         for nc in range(self.ncons):
             val, gd, Hc = self.constraints[nc].eval_hess_forwardADTree(x)
-            H = H + lam[nc]*Hc
+            H += lam[nc]*Hc
 
         # if self.mode=="EqBnd":
         #     H2 = np.zeros((self.nvar,self.nvar))

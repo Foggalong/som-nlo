@@ -84,7 +84,7 @@ def GLSM(x0, func, eps):
 
     iteration = 0
     while (LA.norm(gk) >= eps and iteration < max_iter):
-        iteration = iteration + 1
+        iteration += 1
 
         # - - - - - - - - - find search directions - - - - - - - - - -
 
@@ -146,7 +146,7 @@ def GLSM(x0, func, eps):
             print(f"Line search took {n_eval} function evaluation")
 
         # take step
-        xk = xk + alpha*dk
+        xk += alpha*dk
 
         # remember last dk and gk for conjugate gradients
         gk_prev = gk
@@ -154,7 +154,7 @@ def GLSM(x0, func, eps):
 
         fk = func(0, xk)
         gk = func(1, xk)
-        tot_n_eval = tot_n_eval + 1
+        tot_n_eval += 1
 
         iterates.append(np.array(xk))
 

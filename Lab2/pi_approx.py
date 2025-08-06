@@ -13,7 +13,7 @@ def pi_iter1_arctan(n):
     terms = []
     xs = 0
     for i in range(n):
-        xs = xs + ((-1)**i)*4./(2*i+1)
+        xs += ((-1)**i)*4./(2*i+1)
         terms.append(xs)
 
     return terms
