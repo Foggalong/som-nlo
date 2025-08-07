@@ -1,27 +1,21 @@
 import numpy as np
 
-# method = "FR"
-method = "PR"
-fixPR = "false"
-# fixPR = "true"
 
-
-def CGDirection(gkp, gk, pk, output=True):
+def CGDirection(gkp, gk, pk, method="PR", fixPR=False, output=True):
     """
-    Conjugate Gradient Direction:
-        calculates the next conjugate gradient search direction
-
-    - it needs to be passed the previous gk and pk
-
-    - there are variants to calculate bk based on Fletcher Reeves or Polack-Riv
-
-    - it can be linked with the generic line search method and
-    different line searches
-
-    Called as pkp =  CGDirection(gkp, gk, pk), where
+    Calculates the next conjugate gradient search direction, where:
     - gkp is the gradient at x_{k+1} (calculated outside this method)
     - gk is the gradient at x_k
     - pk is the previous search direction
+
+    Takes an optional string `method` which determines whether bk is
+    found using Fletcher Reeves (`FR`) or Polak-Riviere (`PR`, default).
+
+    Takes an optional boolean `fixPR` (default `False`) which restarts
+    in case PR does not give a descent direction.
+
+    Takes an optional boolean `output` (default `True`) which controls
+    whether to print progress.
     """
 
     if output:
@@ -45,10 +39,9 @@ def CGDirection(gkp, gk, pk, output=True):
     pkp = -gkp + bkp*pk
 
     # restart in case PR does not give descent direction
-    if fixPR == 'true':
-        if np.dot(pkp, gkp) > 0:
-            if output:
-                print("CG: not a descent direction")
-            pkp = -gkp
+    if fixPR and np.dot(pkp, gkp) > 0:
+        if output:
+            print("CG: not a descent direction")
+        pkp = -gkp
 
     return pkp
