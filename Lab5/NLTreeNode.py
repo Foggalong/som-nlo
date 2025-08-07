@@ -1,18 +1,17 @@
 import numpy as np
 
-out = 0
-
 
 class NLTreeNode:
     # ========================== constructor ==============================
 
-    def __init__(self, type, data):
+    def __init__(self, type, data, out=False):
         self.data = data
         self.type = type
         self.nchd = 0
         self.children = []
         self.nprt = 0
         self.parents = []
+        self.output = out
 
     # def __init__(self, data, nchd, children, nprt, parents):
     #  self.data = data
@@ -20,6 +19,7 @@ class NLTreeNode:
     #  self.children = children
     #  self.nprt = nprt
     #  self.parents = parents
+    #  self.output = False
 
     def add_chd(self, chd):
         self.nchd += 1
@@ -134,7 +134,7 @@ class NLTreeNode:
             return (f1*f2, f2*g1+f1*g2)
 
         elif self.type == "^":
-            if out >= 1:
+            if self.output:
                 print("Eval grad ^ node")
             (f1, g1) = self.children[0].eval_grad_forwardADTree(x)
             (f2, g2) = self.children[1].eval_grad_forwardADTree(x)
@@ -170,25 +170,25 @@ class NLTreeNode:
             return (self.data, gd, H)
         elif self.type == "v":
             ix = int(self.data)
-            if out >= 1:
+            if self.output:
                 print(f"v node: ix= {ix:d}, {x[ix]:f}")
             gd = np.zeros(n)
             gd[ix] = 1
-            if out >= 1:
+            if self.output:
                 print(x[ix], gd)
             H = np.zeros((n, n))
             return (x[ix], gd, H)
         elif self.type == "+":
             (f1, g1, H1) = self.children[0].eval_hess_forwardADTree(x)
             (f2, g2, H2) = self.children[1].eval_hess_forwardADTree(x)
-            if out >= 1:
+            if self.output:
                 print(f"+ node: {f1:f}+{f2:f} = {f1+f2:f}")
                 print(f1+f2, g1+g2, H1+H2)
             return (f1+f2, g1+g2, H1+H2)
         elif self.type == "-":
             (f1, g1, H1) = self.children[0].eval_hess_forwardADTree(x)
             (f2, g2, H2) = self.children[1].eval_hess_forwardADTree(x)
-            if out >= 1:
+            if self.output:
                 print(f"- node: {f1:f}+{f2:f} = {f1+f2:f}")
                 print(f1-f2, g1-g2, H1-H2)
             return (f1-f2, g1-g2, H1-H2)
@@ -199,17 +199,17 @@ class NLTreeNode:
             (f1, g1, H1) = self.children[0].eval_hess_forwardADTree(x)
             (f2, g2, H2) = self.children[1].eval_hess_forwardADTree(x)
             # print(f"+ node: {f1:f}+{f2:f} = {f1+f2:f}")
-            if out >= 1:
+            if self.output:
                 print("* node:")
                 print(f1*f2, f2*g1+f1*g2)
             Hr = f1*H2 + f2*H1 + np.outer(g1, g2) + np.outer(g2, g1)
             return (f1*f2, f2*g1+f1*g2, Hr)
         elif self.type == "^":
-            if out >= 1:
+            if self.output:
                 print("Eval grad ^ node")
             (f1, g1, H1) = self.children[0].eval_hess_forwardADTree(x)
             (f2, g2, H2) = self.children[1].eval_hess_forwardADTree(x)
-            if out >= 1:
+            if self.output:
                 print(f"f1 = {f1:f}, g1 = {g1}")
                 print(f"f2 = {f2:f}, g2 = {g2}")
             print(f"+ node: {f1:f}+{f2:f} = {f1+f2:f}")
@@ -288,7 +288,7 @@ class NLTreeNode:
 
         cnt = 0
         for nd in flat:
-            if out >= 1:
+            if self.output:
                 print(f"nd[{cnt:d}] = {nd.type:s} ({nd.data:f}), chd = {nd.nchd:d}, nprt = {nd.nprt:d}")
             cnt += 1
         return flat
@@ -299,10 +299,10 @@ class NLTreeNode:
         """
         if self.type == "v":
             ix = int(self.data)
-            if out >= 1:
+            if self.output:
                 print(f"Found variable {ix:d}")
             if varnodes[ix] is None:
-                if out >= 1:
+                if self.output:
                     print(f"Not registered yet: now at {len(flat):d}")
                 varnodes[ix] = len(flat)
                 flat.append(self)
@@ -311,10 +311,10 @@ class NLTreeNode:
                 # registered: replace the node on the tree by the already
                 # registered one (and add a new parent). Also need to replace
                 # the node on the flat list
-                if out >= 1:
+                if self.output:
                     print(f"var node {ix:d} already on flat tree at position {varnodes[ix]:d}")
                 pos = varnodes[ix]
-                if out >= 1:
+                if self.output:
                     print(f"flat[{pos:d}] is type = {flat[pos].type:s}, ix = {int(flat[pos].data):d}")
                 prnt_nd = self.parents[0]
                 # how do we know which child this is?

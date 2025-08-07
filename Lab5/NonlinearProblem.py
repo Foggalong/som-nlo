@@ -2,8 +2,6 @@ import numpy as np
 
 import NLTreeNode as nlt
 
-out = 1
-
 
 class NonlinearProblem:
     """
@@ -39,7 +37,8 @@ class NonlinearProblem:
     (by creating a g_i(x)-si=0 constraint for any inequality g_i(x)
     """
 
-    def __init__(self, nlfile, mode=None):
+    def __init__(self, nlfile, mode=None, out=1):
+        self.output = out
         f = open(nlfile, "r")
 
         # - - - - - - - - -  reading header - - - - - - -
@@ -73,7 +72,7 @@ class NonlinearProblem:
         self.nlvar_obj = int(tok[1])
         self.nlvar_both = int(tok[2])
 
-        # read sixth line: linear network variables; 
+        # read sixth line: linear network variables;
         l1 = f.readline()
 
         # read seventh line: discrete variables: bin, int, nonlinear (b,c,o)
@@ -91,7 +90,7 @@ class NonlinearProblem:
         # read tenth line: common exprs
         l1 = f.readline()
 
-        if out >= 1:
+        if self.output:
             print(f"Defining nonlinear problem with nvar = {self.nvar:d}, ncon = {self.ncon:d}")
 
         # - - - - - - - - -  end of reading header - - - - - - -
@@ -119,7 +118,7 @@ class NonlinearProblem:
                 for i in range(self.nvar):
                     l1 = f.readline()
                     self.bl[i], self.bu[i] = self.setBoundsFromLine(l1)
-                    if out >= 2:
+                    if self.output == 2:
                         print(f"Set bounds var {i:d}: {self.bl[i]:g} {self.bu[i]:g}")
             elif line[0] == 'r':
                 # read the r-section: table 17: bounds on constraints
@@ -127,7 +126,7 @@ class NonlinearProblem:
                 for i in range(self.ncon):
                     l1 = f.readline()
                     self.cl[i], self.cu[i] = self.setBoundsFromLine(l1)
-                    if out >= 2:
+                    if self.output == 2:
                         print(f"Set bounds con {i:d}: {self.cl[i]:g} {self.cu[i]:g}")
             elif line[0] == 'k':
                 # read the k-section: table 19/20: columns pointers for J
@@ -138,12 +137,12 @@ class NonlinearProblem:
                 for i in range(npts):
                     l1 = f.readline()
                     self.colpts.append(int(l1))
-                if out >= 2:
+                if self.output == 2:
                     print(f"Column pointers are {np.array(self.colpts)}")
             elif line[0] == 'C':
                 tok = line.split()
                 nc = int(tok[0][1:])
-                if out >= 2:
+                if self.output == 2:
                     print(f"Defining constraint {nc:d}")
                 cnd = self.readExpressionTree(self, f)
                 self.constraints.append(cnd)
@@ -151,7 +150,7 @@ class NonlinearProblem:
             elif line[0] == 'O':
                 tok = line.split()
                 nc = int(tok[0][1:])
-                if out >= 2:
+                if self.output == 2:
                     print(f"Defining objective {nc:d}")
                 self.sense = 1  # by default minimize
                 if int(tok[1]) == 1:
@@ -161,7 +160,7 @@ class NonlinearProblem:
             elif line[0] == 'J':
                 tok = line.split()
                 nj = int(tok[0][1:])
-                if out >= 2:
+                if self.output == 2:
                     print(f"Reading J (Jacobian) section: constraint {nj:d}")
                 cnt = int(tok[1])
                 for i in range(cnt):
@@ -174,7 +173,7 @@ class NonlinearProblem:
                 tok = line.split()
                 ng = int(tok[0][1:])
                 cnt = int(tok[1])
-                if out >= 2:
+                if self.output == 2:
                     print(f"Reading G (objective gradient) section: objective {ng:d}")
                 for i in range(cnt):
                     l1 = f.readline()
@@ -183,18 +182,18 @@ class NonlinearProblem:
                     nty = float(tok1[1])  # is the gradient entry
                     self.glin[ix] = nty
 
-        if out >= 2:
+        if self.output == 2:
             print(f"J = {self.Jlin}")
             print(f"G = {self.glin}")
 
         f.close()
 
         self.objflat = self.objective[0].get_flat_tree(self.nvar)
-        if out >= 2:
+        if self.output == 2:
             print(f"nodes in flat obj tree: {len(self.objflat):d}")
 
         self.consflat = self.constraints[0].get_flat_tree(self.nvar)
-        if out >= 2:
+        if self.output == 2:
             print(f"nodes in flat cons[0] tree: {len(self.consflat):d}")
 
         self.mode = mode
@@ -301,12 +300,12 @@ class NonlinearProblem:
         nd = nlt.NLTreeNode(-1, 0)
 
         if c == 'o':
-            if out >= 2:
+            if self.output == 2:
                 print(f"Level {level:d}: operand:", end="")
             tok = line.split()
             op = int(tok[0][1:])
             if op == 0:
-                if out >= 2:
+                if self.output == 2:
                     print("+")
                 c1 = self._readExpressionTree(self, f, level+1)
                 c2 = self._readExpressionTree(self, f, level+1)
@@ -314,7 +313,7 @@ class NonlinearProblem:
                 nd.add_chd(c1)
                 nd.add_chd(c2)
             elif op == 1:
-                if out >= 2:
+                if self.output == 2:
                     print("-")
                 c1 = self._readExpressionTree(self, f, level+1)
                 c2 = self._readExpressionTree(self, f, level+1)
@@ -322,7 +321,7 @@ class NonlinearProblem:
                 nd.add_chd(c1)
                 nd.add_chd(c2)
             elif op == 2:
-                if out >= 2:
+                if self.output == 2:
                     print("*")
                 c1 = self._readExpressionTree(self, f, level+1)
                 c2 = self._readExpressionTree(self, f, level+1)
@@ -330,7 +329,7 @@ class NonlinearProblem:
                 nd.add_chd(c1)
                 nd.add_chd(c2)
             elif op == 3:
-                if out >= 2:
+                if self.output == 2:
                     print("/")
                 c1 = self._readExpressionTree(self, f, level+1)
                 c2 = self._readExpressionTree(self, f, level+1)
@@ -338,7 +337,7 @@ class NonlinearProblem:
                 nd.add_chd(c1)
                 nd.add_chd(c2)
             elif op == 4:
-                if out >= 2:
+                if self.output == 2:
                     print("%")
                 c1 = self._readExpressionTree(self, f, level+1)
                 c2 = self._readExpressionTree(self, f, level+1)
@@ -346,7 +345,7 @@ class NonlinearProblem:
                 nd.add_chd(c1)
                 nd.add_chd(c2)
             elif op == 5:
-                if out >= 2:
+                if self.output == 2:
                     print("^")
                 c1 = self._readExpressionTree(self, f, level+1)
                 c2 = self._readExpressionTree(self, f, level+1)
@@ -354,49 +353,49 @@ class NonlinearProblem:
                 nd.add_chd(c1)
                 nd.add_chd(c2)
             elif op == 15:
-                if out >= 2:
+                if self.output == 2:
                     print("abs()")
                 c1 = self._readExpressionTree(self, f, level+1)
                 nd.set_type("abs")
                 nd.add_chd(c1)
             elif op == 16:
-                if out >= 2:
+                if self.output == 2:
                     print("un-")
                 c1 = self._readExpressionTree(self, f, level+1)
                 nd.set_type("un-")
                 nd.add_chd(c1)
             elif op == 39:
-                if out >= 2:
+                if self.output == 2:
                     print("sqrt()")
                 c1 = self._readExpressionTree(self, f, level+1)
                 nd.set_type("sqrt")
                 nd.add_chd(c1)
             elif op == 41:
-                if out >= 2:
+                if self.output == 2:
                     print("sin()")
                 c1 = self._readExpressionTree(self, f, level+1)
                 nd.set_type("sin")
                 nd.add_chd(c1)
             elif op == 43:
-                if out >= 2:
+                if self.output == 2:
                     print("ln()")
                 c1 = self._readExpressionTree(self, f, level+1)
                 nd.set_type("ln")
                 nd.add_chd(c1)
             elif op == 44:
-                if out >= 2:
+                if self.output == 2:
                     print("exp()")
                 c1 = self._readExpressionTree(self, f, level+1)
                 nd.set_type("exp")
                 nd.add_chd(c1)
             elif op == 46:
-                if out >= 2:
+                if self.output == 2:
                     print("cos()")
                 c1 = self._readExpressionTree(self, f, level+1)
                 nd.set_type("cos")
                 nd.add_chd(c1)
             elif op == 54:
-                if out >= 2:
+                if self.output == 2:
                     print("sum()")
                 line = f.readline()
                 tok = line.split()
@@ -411,16 +410,16 @@ class NonlinearProblem:
         elif c == 'n':
             tok = line.split()
             const = float(tok[0][1:])
-            if out >= 2:
+            if self.output == 2:
                 print(f"Level {level:d}: number: {const:f}")
             nd = nlt.NLTreeNode("n", const)
         elif c == 'v':
             tok = line.split()
             ix = int(tok[0][1:])
-            if out >= 2:
+            if self.output == 2:
                 print(f"Level {level:d}: variable: {ix:d}")
-            if self.varnodes[ix] == None:
-                if out >= 2:
+            if self.varnodes[ix] is None:
+                if self.output == 2:
                     print("Not registered yet")
                 nd = nlt.NLTreeNode("v", ix)
                 self.varnodes[ix] = nd
@@ -440,7 +439,7 @@ class NonlinearProblem:
                                                     x[0:self.orignvar])
 
     def eval_constraint(self, nc, x):
-        if out >= 2:
+        if self.output == 2:
             print(f"eval cons[{nc:d}]: {self.constraints[nc].to_string():s}")
 
         csbdy = self.constraints[nc].eval_val(x)+np.dot(self.Jlin[nc, :],
@@ -454,7 +453,7 @@ class NonlinearProblem:
         return csbdy
 
     def eval_objgrad(self, x):
-        if out >= 2:
+        if self.output == 2:
             print(f"eval objgrad: {self.objective[0].to_string():s}")
         val, gd = self.objective[0].eval_grad_forwardADTree(x)
         # print(f"self.glin[0] = {self.glin}")
@@ -462,10 +461,10 @@ class NonlinearProblem:
         return gd
 
     def eval_consgrad(self, nc, x):
-        if out >= 2:
+        if self.output == 2:
             print(f"eval_consgrad[{nc:d}]: {self.constraints[nc].to_string():s}")
         val, gd = self.constraints[nc].eval_grad_forwardADTree(x)
-        if out >= 2:
+        if self.output == 2:
             print(f"self.Jlin[nc,:] = {self.Jlin[nc, :]}")
 
         gd[0:self.orignvar] = gd[0:self.orignvar]+self.Jlin[nc, :]
@@ -478,7 +477,7 @@ class NonlinearProblem:
         return gd
 
     def eval_objhess(self, x):
-        if out >= 1:
+        if self.output:
             print(f"eval_objhess: {self.objective[0].to_string():s}")
         val, gd, H = self.objective[0].eval_hess_forwardADTree(x)
 
@@ -491,7 +490,7 @@ class NonlinearProblem:
         return H
 
     def eval_conshess(self, nc, x):
-        if out >= 1:
+        if self.output:
             print(f"eval_conshess[{nc:d}]: {self.constraints[nc].to_string():s}")
         val, gd, H = self.constraints[nc].eval_hess_forwardADTree(x)
         # if self.mode=="EqBnd":

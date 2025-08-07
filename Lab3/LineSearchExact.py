@@ -1,10 +1,8 @@
 import numpy as np
 from numpy import linalg as LA
 
-out = 0   # level pf printing from the method (0 or 1)
 
-
-def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
+def LineSearchExact(xk, d, tol, func, ret_n_eval=False, output=False):
     """
     Exact Linesearch from xk in direction d with tolerance eps
 
@@ -31,11 +29,9 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
         - step 2: then do a bisection linesearch to find the solution to
                  d'*nabla f(x+au*d)=0
               to within the specified tolerance
-    """
 
-    # print(xk)
-    # print(func(1, xk))
-    # print(d)
+    # output: level pf printing from the method (0 or 1)
+    """
 
     n_eval = 0  # count number of function evaluations
 
@@ -61,9 +57,6 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
     fn = func(0, xk+alpha*d)  # function value
     gn = func(1, xk+alpha*d).dot(d)  # slope
     n_eval += 1
-    # print(func(1, xk+au*d))
-    # print(d)
-    # print(gn)
 
     # do a bisection type line search for step 1
     found = 0  # loop until we find an au with fu < fl and gu > 0
@@ -71,17 +64,17 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
 
         # if fn < fl and gn>0 we are done
         # if fn > fl we need to get to smaller values
-        if out == 1:
+        if output:
             print(f"alpha = {alpha}")
         if fn < fl:
             if gn > 0:
-                if out == 1:
+                if output:
                     print("f1<f0 and g1>0: end of phase 1")
                 found = 1
             else:  # gn < 0
                 # should try larger values of alpha
                 # but the currently found alpha is a good al
-                if out == 1:
+                if output:
                     print("still gn < 0, try larger alpha and al = alpha")
                 al = alpha
                 fl = fn
@@ -94,10 +87,10 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
                     # -> need to increase alpha
                     al = alpha
                     alpha = 0.5*(al+au)
-                    if out == 1:
+                    if output:
                         print("f(alpha)<0 and g(alpha)<0 -> increase alpha")
         else:  # in case we have stepped too far with alpha and get increase
-            if out == 1:
+            if output:
                 print("fn > fl -> try smaller alpha, reduce au = alpha")
             # in this case fn > fl:
             # -> should try smaller values of alpha
@@ -111,7 +104,7 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
     au = alpha
     # we should now be at a position where the exact alpha is between al and au
     # report progress
-    if out == 1:
+    if output:
         print(f"after step 1: al = {al:8.5f}, au= {au:8.5f}")
         print(f"f0 = {fl}, f(al) = {fl}, f(au) = {fu}")
         print(f"g(al) = {gl}, g(au) = {gu}")
@@ -131,7 +124,7 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
         gn = func(1, xk+am*d).dot(d)
         n_eval += 1
 
-        if out == 1:
+        if output:
             print(f"am = {am:8.5f}, slope = {gn:8.5f}")
 
         if gn > 0:
@@ -143,7 +136,7 @@ def LineSearchExact(xk, d, tol, func, ret_n_eval=False):
             fl = fn
             gl = gn
 
-        if out == 1:
+        if output:
             print(f"new interval: al = {al:8.5f}, au = {au:8.5f}")
 
     if fn > f00:

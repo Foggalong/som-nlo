@@ -1,7 +1,7 @@
 # from LSPlot import LSPlot
 
 
-def LineSearchBacktrack(xk, d, c1, func, ret_n_eval=False):
+def LineSearchBacktrack(xk, d, c1, func, ret_n_eval=False, output=True):
     """
     Backtracking Armijo Linesearch from xk in direction d with parameter c1
 
@@ -15,21 +15,20 @@ def LineSearchBacktrack(xk, d, c1, func, ret_n_eval=False):
     from rosenbrock import rosenbrock
     from LineSearchBacktrack import LineSearchBacktrack
     alpha = LineSearchBacktrack(np.array([-1,1]), np.array([1, -1]), 0.9, rosenbrock)
+
+    output: require output? (values 0 or 1)
     """
 
     # parameters to be used in the line search
     tau = 0.5
     alpha0 = 1
 
-    # require output? (values 0 or 1)
-    out = 1
-
     n_eval = 0
     f0 = func(0, xk)    # initial value
     g0 = func(1, xk).dot(d)  # initial slope
     n_eval += 1
 
-    if out > 1:
+    if output:
         print(f"f0 = {f0}")
         print(f"g0 = {g0}")
 
@@ -39,7 +38,7 @@ def LineSearchBacktrack(xk, d, c1, func, ret_n_eval=False):
     f1 = func(0, xk+alpha*d)
     n_eval += 1
 
-    if out == 1:
+    if output:
         print(f"al= {alpha:8.5f}, reduction= {f0-f1:8.5f}, required= {-c1*alpha*g0:8.5f}")
 
     # start loop (if not enough reduction)
@@ -50,10 +49,10 @@ def LineSearchBacktrack(xk, d, c1, func, ret_n_eval=False):
         n_eval += 1
 
         # report progress
-        if out == 1:
+        if output:
             print(f"al= {alpha:8.5f}, reduction= {f0-f1:8.5f}, required= {-c1*alpha*g0:8.5f}")
 
-    if out == 1:
+    if output:
         print(f"return al = {alpha:8.5f}")
 
     # LSPlot(xk, d, c1, func, alpha)

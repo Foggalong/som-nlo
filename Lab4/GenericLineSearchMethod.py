@@ -31,12 +31,10 @@ do_CG_restarts = False  # restart CG method every n iterations
 do_Newton_InertiaCorr = False  # add tau*I to the Newton Hessian for pos def
 minEV = 1e-4
 
-out = 1  # printing from method: 0=quiet, 1=path, 2=diagnostic
-
 # ------------------ end parameters for the method --------------------------
 
 
-def GLSM(x0, func, eps):
+def GLSM(x0, func, eps, output=1):
     """
     Generic Line Search Method: applies a generic line search method to
     optimize a given function
@@ -62,11 +60,12 @@ def GLSM(x0, func, eps):
     from rosenbrock import rosenbrock
     from GenericLineSearchMethod import GLSM
     path = GLSM(x0, rosenbrock, 1e-4)
+
+    output = 1  # printing from method: 0=quiet, 1=path, 2=diagnostic
     """
 
-    if (not isinstance(x0, np.ndarray)):
-        print("The argument x0 must be a np.array")
-        return
+    if not isinstance(x0, np.ndarray):
+        raise TypeError("The argument x0 must be a np.array")
 
     n = x0.size
     # this is to keep a list of iterates
@@ -78,12 +77,11 @@ def GLSM(x0, func, eps):
     iterate_list.append(np.array(xk))
     tot_n_eval = 1
 
-    if out == 2:
-        print(f"Initial x0 = \n{xk}")
-        print(f"Initial f(x0) = \n{fk}")
-        print(f"Initial g0 = \n{gk}")
-
-    if out == 1:
+    if output:
+        if output == 2:
+            print(f"Initial x0 = \n{xk}")
+            print(f"Initial f(x0) = \n{fk}")
+            print(f"Initial g0 = \n{gk}")
         print(f"f = {fk:8.5g}, |g| = {LA.norm(gk):8.5g}")
 
     # set these for Conjugate Gradients
@@ -118,22 +116,20 @@ def GLSM(x0, func, eps):
         elif direction == 'Newton':
             # Newton Method
             Hk = func(2, xk)
-            # print(Hk)
             # this down here is the inertia correction
             v, w = LA.eig(Hk)
-            print("Eigenvalues of Hessian:")
-            print(v)
+            if output:
+                print("Eigenvalues of Hessian:")
+                print(v)
             l_min = min(v)
             if (do_Newton_InertiaCorr and l_min < minEV):
-                # val, L = Chol(Hk)
-                # print((val, L))
-
                 tau = -l_min+minEV
+                if output:
+                    print(f"Inertia correction: {tau:f}")
                 Hk += tau*np.eye(n)
-                print(f"Inertia correction: {tau:f}")
-                # print(Hk)
                 v, w = LA.eig(Hk)
-                print(v)
+                if output:
+                    print(v)
 
             dk = - np.linalg.solve(Hk, gk)
             # check for too large direction
@@ -157,7 +153,7 @@ def GLSM(x0, func, eps):
             dk = -gk
 
         # - - - - - - - - - -  do a line search - - - - - - - - - -
-        if out > 1:
+        if output == 2:
             print(f"dk = \n{dk}")
 
         # counter for number of function evaluations in line search method
@@ -181,7 +177,7 @@ def GLSM(x0, func, eps):
             raise ValueError("Linesearch code not recognized")
 
         tot_n_eval += n_eval
-        if out >= 1:
+        if output:
             print(f"Line search took {n_eval} function evaluation")
 
         # remember last xk for conjugate gradients and QN
@@ -200,13 +196,14 @@ def GLSM(x0, func, eps):
 
         iterate_list.append(np.array(xk))
 
-        if out >= 1:
+        if output:
             print(f"it={iterations:3d}: f = {fk:8.5g}, |g| = {LA.norm(gk):8.5g}")
-        if out > 1:
-            print(f"xk=\n{xk}")
-            print(f"gk=\n{gk}")
+            if output == 2:
+                print(f"xk=\n{xk}")
+                print(f"gk=\n{gk}")
 
-    print(f"Hessian at sol:\n{func(2, xk)}")
+    if output:
+        print(f"Hessian at sol:\n{func(2, xk)}")
+        print(f"GLSM took total of {tot_n_eval} function evaluations")
 
-    print(f"GLSM took total of {tot_n_eval} function evaluations")
     return np.array(iterate_list)

@@ -19,12 +19,10 @@ fact_dec = 0.25  # factor by which to decrease TR
 
 iterations = 100  # iteration limit
 
-out = 1  # printing from method: 0=quiet, 1=path, 2=diagnostic
-
 # ------------------ end parameters for the method --------------------------
 
 
-def GTRM(x0, func, eps):
+def GTRM(x0, func, eps, output=1):
     """
     Generic Trust Region Method: applies a generic trust region method to
     optimize a given function
@@ -52,11 +50,12 @@ def GTRM(x0, func, eps):
         from rosenbrock import rosenbrock
         from GenericTrustRegionMethod import GTRM
         path = GTRM(x0, rosenbrock, 1e-4)
+
+    output = 1  # printing from method: 0=quiet, 1=path, 2=diagnostic
     """
 
-    if (not isinstance(x0, np.ndarray)):
-        print("The argument x0 must be a np.array")
-        return
+    if not isinstance(x0, np.ndarray):
+        raise TypeError("The argument x0 must be a np.array")
 
     # n = x0.size  # BUG variable unused
     # this is to keep a list of iterates
@@ -71,12 +70,11 @@ def GTRM(x0, func, eps):
     tot_g_eval = 1
     tot_solves = 0
 
-    if out >= 3:
-        print(f"Initial x0=\n{xk}")
-        print(f"Initial f(x0)=\n{fk}")
-        print(f"Initial g(x0)=\n{gk}")
-
-    if out >= 1:
+    if output:
+        if output == 2:
+            print(f"Initial x0=\n{xk}")
+            print(f"Initial f(x0)=\n{fk}")
+            print(f"Initial g(x0)=\n{gk}")
         print(f"it=  0: f = {fk:8.5g}, |g| = {LA.norm(gk):8.3g}")
 
     rho = r0
@@ -96,30 +94,29 @@ def GTRM(x0, func, eps):
         else:
             raise ValueError("Direction code not recognized")
 
-        if out >= 2:
-            print(f"TR subproblem takes {n_solves:d} solves")
         tot_solves += n_solves
 
-        if out >= 3:
+        if output == 2:
+            print(f"TR subproblem takes {n_solves:d} solves")
             print(f"dk = {dk}")
 
         # - - - - - - - - - -  do the TR logic - - - - - - - - - - -
 
         xkp = xk+dk
         fkp = func(0, xkp)
-        tot_f_eval +=  1
+        tot_f_eval += 1
 
         # predicted decrease = m(0) - m(dk) =
         pred_dec = -(0.5*np.dot(dk, np.dot(B, dk)) + np.dot(g, dk))
         # actual decrease = f(xk) - f(xkp)
         actual_dec = fk - fkp
-        if out >= 2:
+        if output == 2:
             print(f"  pred dec = {pred_dec:8.5f}")
             print(f"  actu dec = {actual_dec:8.5f}")
 
         # delta to predicted/actual
         delta = actual_dec/pred_dec
-        if out >= 2:
+        if output == 2:
             print(f"  -> delta = {delta:8.5f}")
 
         # do the actual trust region logic
@@ -129,19 +126,19 @@ def GTRM(x0, func, eps):
             tot_g_eval += 1
             if np.abs(LA.norm(dk)-rho)/rho < 0.1:
                 rho = fact_inc*rho
-            if out >= 2:
+            if output == 2:
                 print(f"  ->accept step and increase rho = {rho}")
         elif delta > del_lo:
             # accept step but leave TR radius as it was
             xkn = xkp
             tot_g_eval += 1
-            if out >= 2:
+            if output == 2:
                 print("  ->accept step and leave rho unchanged")
         else:
             # reject step and decrease TR radius
             xkn = xk
             rho = fact_dec*rho
-            if out >= 2:
+            if output == 2:
                 print(f"  ->reject step and decrease rho = {rho}")
 
         # take whatever step was decided
@@ -153,14 +150,16 @@ def GTRM(x0, func, eps):
 
         iterations_list.append(np.array(xk))
 
-        if out >= 1:
+        if output:
             print(f"it={iterations:3d}: f = {fk:8.5g}, |g| = {LA.norm(gk):8.3g}")
             print(f", rho={rho:8.3g}, n_solves = {n_solves:3d}")
-        if out >= 3:
-            print(f"xk={xk}")
-            print(f"gk={gk}")
+            if output == 2:
+                print(f"xk={xk}")
+                print(f"gk={gk}")
 
-    print(f"GTRM took total of {tot_f_eval} function evaluations")
-    print(f"GTRM took total of {tot_g_eval} gradient evaluations")
-    print(f"GTRM took total of {tot_solves} solves in TR subproblem")
+    if output:
+        print(f"GTRM took total of {tot_f_eval} function evaluations")
+        print(f"GTRM took total of {tot_g_eval} gradient evaluations")
+        print(f"GTRM took total of {tot_solves} solves in TR subproblem")
+
     return np.array(iterations_list)

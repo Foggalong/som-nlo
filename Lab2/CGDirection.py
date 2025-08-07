@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def CGDirection(gkp, gk, pk):
+def CGDirection(gkp, gk, pk, output=True):
     """
     Calculates the next conjugate gradient search direction
 
@@ -18,20 +18,24 @@ def CGDirection(gkp, gk, pk):
       - pk is the previous search direction
     """
 
-    print("Called CGDirection")
+    if output:
+        print("Called CGDirection")
 
     # in first iteration return the steepest descent direction
     if gk is None:
-        print("CG return SD direction")
+        if output:
+            print("CG return SD direction")
         return -gkp
 
     # this is Fletcher Reeves
     bkp = np.dot(gkp, gkp)/np.dot(gk, gk)
     # this is Polak-Riviere
     # bkp = np.dot(gkp - gk, gkp)/np.dot(gk, gk)
-    # print("Bk = "+str(bkp))
+    # if output:
+    #     print(f"Bk = {bkp}")
 
     pkp = -gkp + bkp*pk
 
-    print(f"pkp = \n{pkp}")
+    if output:
+        print(f"pkp = \n{pkp}")
     return pkp

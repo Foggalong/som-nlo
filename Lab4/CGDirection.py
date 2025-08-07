@@ -6,7 +6,7 @@ fixPR = "false"
 # fixPR = "true"
 
 
-def CGDirection(gkp, gk, pk):
+def CGDirection(gkp, gk, pk, output=True):
     """
     Conjugate Gradient Direction:
         calculates the next conjugate gradient search direction
@@ -24,11 +24,13 @@ def CGDirection(gkp, gk, pk):
     - pk is the previous search direction
     """
 
-    print("Called CGDirection")
+    if output:
+        print("Called CGDirection")
 
     # in first iteration return the steepest descent direction
     if gk is None:
-        print("CG return SD direction")
+        if output:
+            print("CG return SD direction")
         return -gkp
 
     if method == 'FR':
@@ -45,9 +47,8 @@ def CGDirection(gkp, gk, pk):
     # restart in case PR does not give descent direction
     if fixPR == 'true':
         if np.dot(pkp, gkp) > 0:
-            print("CG: not a descent direction")
+            if output:
+                print("CG: not a descent direction")
             pkp = -gkp
 
-    # print("pkp = ")
-    # print(pkp)
     return pkp

@@ -2,8 +2,6 @@ import numpy as np
 
 import NonlinearProblem as NLP
 
-out = 1
-
 
 def eval_cviol(nlp, c):
     h = 0.0
@@ -18,7 +16,7 @@ def eval_cviol(nlp, c):
 gamma = 1    # gamma to use for the merit function
 
 
-def is_improvement(nlp, xk, xkp):
+def is_improvement(nlp, xk, xkp, output=True):
     # evaluate objective function value and constraint violation at
     # the current point and the potential new point
 
@@ -34,14 +32,14 @@ def is_improvement(nlp, xk, xkp):
     m = f+gamma*h
     mp = fp+gamma*hp
 
-    if out >= 1:
+    if output:
         print(f"merit function before/after: {f+gamma*h:f}, {fp+gamma*hp:f}")
 
     if (fp+gamma*hp < f+gamma*h):
-        if out >= 1:
+        if output:
             print("improvement")
         return True
     else:
-        if out >= 1:
+        if output:
             print("no improvement")
         return False

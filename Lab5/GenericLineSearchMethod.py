@@ -31,12 +31,10 @@ do_CG_restarts = False  # restart CG method every n iterations
 do_Newton_InertiaCorr = True  # add tau*I to the Newton Hessian for pos def
 minEV = 1e-4
 
-out = 1  # printing from method: 0=quiet, 1=path, 2=diagnostic
-
 # ------------------ end parameters for the method --------------------------
 
 
-def GLSM(x0, func, eps):
+def GLSM(x0, func, eps, output=1):
     """
     Generic Line Search Method: applies a generic line search method to
     optimize a given function
@@ -62,10 +60,12 @@ def GLSM(x0, func, eps):
     from rosenbrock import rosenbrock
     from GenericLineSearchMethod import GLSM
     path = GLSM(x0, rosenbrock, 1e-4)
+
+    output = 1  # printing from method: 0=quiet, 1=path, 2=diagnostic
     """
 
-    if (not isinstance(x0, np.ndarray)):
-        raise ValueError("The argument x0 must be a np.array")
+    if not isinstance(x0, np.ndarray):
+        raise TypeError("The argument x0 must be a np.array")
 
     n = x0.size
     # this is to keep a list of iterates
@@ -77,15 +77,12 @@ def GLSM(x0, func, eps):
     iterate_list.append(np.array(xk))
     tot_n_eval = 1
 
-    if out == 2:
-        print(f"Initial x0 = {xk}")
-        print(f"Initial f0 = {fk}")
-        print(f"Initial g0 = {gk}")
-
-    if out >= 1:
+    if output:
+        if output == 2:
+            print(f"Initial x0 = {xk}")
+            print(f"Initial f0 = {fk}")
+            print(f"Initial g0 = {gk}")
         print(f"Start generic line search method: Line search = {linesearch:s}, Direction = {direction:s}")
-
-    if out >= 1:
         print(f"it = {0:d}: f = {fk:8.5g}, |g| = {LA.norm(gk):8.5g}")
 
     # set these for Conjugate Gradients
@@ -160,7 +157,7 @@ def GLSM(x0, func, eps):
             dk = -gk
 
         # - - - - - - - - - -  do a line search - - - - - - - - - -
-        if out > 1:
+        if output == 2:
             print(f"dk = \n{dk}")
 
         # counter for number of function evaluations in line search method
@@ -184,7 +181,7 @@ def GLSM(x0, func, eps):
             raise ValueError("Linesearch code not recognized")
 
         tot_n_eval += n_eval
-        if out >= 1:
+        if output:
             print(f"Line search took {n_eval} function evaluation")
 
         # remember last xk for conjugate gradients and QN
@@ -203,13 +200,13 @@ def GLSM(x0, func, eps):
 
         iterate_list.append(np.array(xk))
 
-        if out >= 1:
+        if output:
             print(f"it = {iterations:3d}: f = {fk:8.5g}, |g| = {LA.norm(gk):8.5g}")
-        if out > 1:
-            print(f"xk = {xk}")
-            print(f"gk = {gk}")
+            if output == 2:
+                print(f"xk = {xk}")
+                print(f"gk = {gk}")
 
-    if out >= 2:
+    if output == 2:
         print(f"Hessian at sol:\n{func(2, xk)}")
 
     print(f"GLSM took total of {tot_n_eval} function evaluations")

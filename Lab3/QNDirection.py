@@ -5,7 +5,7 @@ update = "SR1"
 # update = "BFGS"
 
 
-def QNDirection(Hk, xkp, xk, gkp, gk):
+def QNDirection(Hk, xkp, xk, gkp, gk, output=True):
     """
     Quasi-Newton Direction:
         calculates the next direction for Quasi-Newton methods
@@ -28,7 +28,8 @@ def QNDirection(Hk, xkp, xk, gkp, gk):
     - Hkp: the new Hessian approximation
     """
 
-    print("Called QNDirection")
+    if output:
+        print("Called QNDirection")
 
     delta = xkp - xk
     y = gkp - gk
@@ -67,7 +68,8 @@ def QNDirection(Hk, xkp, xk, gkp, gk):
     else:
         raise ValueError("did not recognise update")
 
-    print(f"QN inverse Hessian approx is:\n{Hkp}")
+    if output:
+        print(f"QN inverse Hessian approx is:\n{Hkp}")
 
     dkp = -Hkp.dot(gkp)
 

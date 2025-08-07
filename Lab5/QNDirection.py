@@ -4,10 +4,8 @@ import numpy as np
 # update = "DFP"
 update = "BFGS"
 
-out = 0
 
-
-def QNDirection(Hk, xkp, xk, gkp, gk):
+def QNDirection(Hk, xkp, xk, gkp, gk, output=False):
     """
     Quasi-Newton Direction:
         calculates the next direction for Quasi-Newton methods
@@ -30,7 +28,7 @@ def QNDirection(Hk, xkp, xk, gkp, gk):
     - Hkp: the new Hessian approximation
     """
 
-    if out >= 1:
+    if output:
         print("Called QNDirection")
 
     delta = xkp - xk
@@ -68,7 +66,7 @@ def QNDirection(Hk, xkp, xk, gkp, gk):
     else:
         raise ValueError("did not recognise update")
 
-    if out >= 1:
+    if output:
         print(f"QN inverse Hessian approx is:\n{Hkp}")
 
     dkp = -Hkp.dot(gkp)

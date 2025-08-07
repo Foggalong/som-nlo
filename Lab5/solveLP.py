@@ -2,7 +2,7 @@ import numpy as np
 from scipy.optimize import linprog
 
 
-def solveLP(c, A, bl, bu, cl, cu):
+def solveLP(c, A, bl, bu, cl, cu, output=False):
     """
     this is a convenient wrapper method that allows to solve an LP problem
     defined as
@@ -26,14 +26,12 @@ def solveLP(c, A, bl, bu, cl, cu):
     - status: from linprog (0=solved, 2=infeasible)
     """
 
-    out = 0
-
     n = cl.size
     m = bl.size
 
     # 1) ------ change the inequality constraints to equalities -----
 
-    if out >= 2:
+    if output:
         print("solve LP called with the following LP:")
         print(f"c = \n{c}")
         print(f"A = \n{A}")
@@ -85,16 +83,15 @@ def solveLP(c, A, bl, bu, cl, cu):
     # call linprog
     res = linprog(caug, A_eq=AAug, b_eq = newb, bounds = bounds)
 
-    if out >= 1:
+    if output:
         print(res.message)
     x = res.x[0:n]
 
-    if out >= 1:
+    if output:
         print(f"Linprog return solution:\n{x}")
 
     if res.status > 0:
-        if out >= 2:
-
+        if output:
             for i in range(n):
                 print(f"cl, x, cu[{i:d}]: {cl[i]:f} {x[i]:f} {cu[i]:f}")
 

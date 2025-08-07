@@ -1,30 +1,3 @@
-"""
-Generic Line Search Method: applies a generic line search method to
-optimize a given function
-
-Can choose between different search directions (coordinate descent,
-steepest descent, conjugate gradients) and line search methods
-(backtracking, bisection, exact and pre-determined)
-
-will return the path taken by the method (so that it can be plotted later)
-
-Called as path = GLSM(x0, function, tol);
-
-where
-    x0 = starting point
-    function = the function to be minimized
-            [assumes that the function can be called as
-            function(0, x), function(1, x), function(2, x)]
-    tol = the convergence tolerance: iterate until |nabla f(x)| < tol
-
-possible calling sequence is
-
-import numpy as np
-from rosenbrock import rosenbrock
-from GenericLineSearchMethod import GLSM
-path = GLSM(x0, rosenbrock, 1e-4)
-"""
-
 import numpy as np
 from numpy import linalg as LA   # we need this module for the norm
 
@@ -51,15 +24,41 @@ tol = 1e-7  # tolerance for exact linesearch
 max_iter = 100  # iteration limit
 do_CG_restarts = False  # restart CG method every n iterations
 
-out = 1  # printing from method: 0=quiet, 1=path, 2=diagnostic
-
 # ------------------ end parameters for the method --------------------------
 
 
-def GLSM(x0, func, eps):
-    if (not isinstance(x0, np.ndarray)):
-        print("The argument x0 must be a np.array")
-        return
+def GLSM(x0, func, eps, output=1):
+    """
+    Generic Line Search Method: applies a generic line search method to
+    optimize a given function
+
+    Can choose between different search directions (coordinate descent,
+    steepest descent, conjugate gradients) and line search methods
+    (backtracking, bisection, exact and pre-determined)
+
+    will return the path taken by the method (so that it can be plotted later)
+
+    Called as path = GLSM(x0, function, tol);
+
+    where
+        x0 = starting point
+        function = the function to be minimized
+                [assumes that the function can be called as
+                function(0, x), function(1, x), function(2, x)]
+        tol = the convergence tolerance: iterate until |nabla f(x)| < tol
+
+    possible calling sequence is
+
+    import numpy as np
+    from rosenbrock import rosenbrock
+    from GenericLineSearchMethod import GLSM
+    path = GLSM(x0, rosenbrock, 1e-4)
+
+    output = 1  # printing from method: 0=quiet, 1=path, 2=diagnostic
+    """
+
+    if not isinstance(x0, np.ndarray):
+        raise TypeError("The argument x0 must be a np.array")
 
     n = x0.size
     # this is to keep a list of iterates
@@ -71,11 +70,9 @@ def GLSM(x0, func, eps):
     iterates.append(np.array(xk))
     tot_n_eval = 1
 
-    # print(xk)
-    if out == 2:
-        print(f"Initial g0 = \n{gk}")
-
-    if out == 1:
+    if output:
+        if output == 2:
+            print(f"Initial g0 = \n{gk}")
         print(f"f = {fk:8.5g}, |g| = {LA.norm(gk):8.5g}")
 
     # set these for Conjugate Gradients
@@ -113,12 +110,13 @@ def GLSM(x0, func, eps):
 
         # check for descent direction
         if dk.dot(gk) >= 0:
-            print(f"dk = \n{dk}")
+            if output:
+                print(f"dk = \n{dk}")
             raise ValueError("search direction is not a descent direction: STOP")
             dk = -gk
 
         # - - - - - - - - - -  do a line search - - - - - - - - - -
-        if out > 1:
+        if output == 2:
             print(f"dk = \n{dk}")
 
         # counter for number of function evaluations in line search method
@@ -142,7 +140,7 @@ def GLSM(x0, func, eps):
             raise ValueError("Linesearch code not recognized")
 
         tot_n_eval += n_eval
-        if out >= 1:
+        if output:
             print(f"Line search took {n_eval} function evaluation")
 
         # take step
@@ -158,11 +156,13 @@ def GLSM(x0, func, eps):
 
         iterates.append(np.array(xk))
 
-        if out >= 1:
+        if output:
             print(f"it = {iteration:3d}: f = {fk:8.5g}, |g| = {LA.norm(gk):8.5g}")
-        if out > 1:
-            print(f"xk =\n{xk}")
-            print(f"gk =\n{gk}")
+            if output == 2:
+                print(f"xk =\n{xk}")
+                print(f"gk =\n{gk}")
 
-    print(f"GLSM took total of {tot_n_eval} function evaluations")
+    if output:
+        print(f"GLSM took total of {tot_n_eval} function evaluations")
+
     return np.array(iterates)

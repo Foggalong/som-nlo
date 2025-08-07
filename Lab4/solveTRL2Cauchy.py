@@ -1,11 +1,10 @@
 import numpy as np
 from numpy import linalg as LA
 
-out = 2        # level pf printing from the method (0 or 1)
 max_iter = 20  # max trials in the lambda-adjustment loop
 
 
-def solveTRL2Cauchy(B, g, rho, ret_n_eval=False):
+def solveTRL2Cauchy(B, g, rho, ret_n_eval=False, output=True):
     """
     Solve the L2 Trust Region subproblem with the Cauchy-Point method
     (and potentially dog-leg improvement)
@@ -20,13 +19,8 @@ def solveTRL2Cauchy(B, g, rho, ret_n_eval=False):
         (4) the minimizer along the dog-leg path
     """
 
-    if out >= 1:
+    if output:
         print(f"Called solveTRL2Cauchy with rho={rho:8.3g}")
-        if out >= 2:
-            print(B)
-            v, w = np.linalg.eig(B)
-            print(v)
-            print(g)
 
     n = g.size
 
@@ -44,11 +38,11 @@ def solveTRL2Cauchy(B, g, rho, ret_n_eval=False):
         if stepsize < 1:
             tau = stepsize
 
-    if out >= 1:
+    if output:
         print(f"tau = {tau:f}")
     dC = tau*rho/LA.norm(g)*dS
     mdC = 0.5*np.dot(dC, np.dot(B, dC)) + np.dot(g, dC)
-    if out >= 1:
+    if output:
         print(f"|dC| = {LA.norm(dC):f}")
         print(f"mdC = {mdC:f}")
 
@@ -60,21 +54,21 @@ def solveTRL2Cauchy(B, g, rho, ret_n_eval=False):
     d = dC
 
     if tau < 1:
-        if out >= 1:
+        if output:
             print("Attempt dog-leg")
         # (3) find the unconstrained minimizer
 
         try:
             dU = LA.solve(B, -g)
         except LA.LinAlgError:
-            if out >= 1:
+            if output:
                 print("Cannot solve for dU")
             dU = np.zeros(n)
 
         n_eval += 1
         mdU = 0.5*np.dot(dU, np.dot(B, dU)) + np.dot(g, dU)
 
-        if out >= 1:
+        if output:
             print(f"|dU| = {LA.norm(dU):f}")
             print(f"mdU = {mdU:f}")
 
@@ -83,12 +77,12 @@ def solveTRL2Cauchy(B, g, rho, ret_n_eval=False):
         if (LA.norm(dU) <= rho and mdU < mdC):
             # no dog-leg, but return dU
             d = dU
-            if out >= 1:
+            if output:
                 print("return dU")
 
         if (LA.norm(dU) > rho and mdU < mdC):
             # (4) find the minimizer along the dog-leg path
-            if out >= 1:
+            if output:
                 print(f"dC = {dC}")
                 print(f"dU = {dU}")
 
@@ -116,17 +110,16 @@ def solveTRL2Cauchy(B, g, rho, ret_n_eval=False):
             dDL = dC + lam*(dU-dC)
             mdDL = 0.5*np.dot(dDL, np.dot(B, dDL)) + np.dot(g, dDL)
 
-            if out >= 1:
+            if output:
                 print(f"|dDL| = {LA.norm(dDL):f}")
                 print(f"mdDL = {mdDL:f}")
 
             if np.abs(LA.norm(dDL)-rho) > 1e-4:
-                print("dDL not on TR boundary")
-                raise Exception("Not on TR boundary")
+                raise Exception("dDL not on TR boundary")
 
             if mdDL < mdC:
                 d = dDL
-                if out >= 1:
+                if output:
                     print("return dDL")
 
     if ret_n_eval:

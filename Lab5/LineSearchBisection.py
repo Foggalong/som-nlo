@@ -3,11 +3,8 @@ import numpy as np
 
 max_alpha = 10000
 
-# require output (values 0 or 1)
-out = 0
 
-
-def LineSearchBisection(xk, d, c1, c2, func, ret_n_eval=False):
+def LineSearchBisection(xk, d, c1, c2, func, ret_n_eval=False, output=False):
     """
     Bisection Linesearch from xk in direction d with parameters c1 and c2
 
@@ -21,6 +18,8 @@ def LineSearchBisection(xk, d, c1, c2, func, ret_n_eval=False):
     from rosenbrock import rosenbrock
     from LineSearchBisection import LineSearchBisection
     alpha = LineSearchBisection(np.array([-1,1]), np.array([1, -1]), 0.1, 0.9, rosenbrock)
+
+    output: require output (values 0 or 1)
     """
 
     # initial trial stepsize
@@ -39,7 +38,7 @@ def LineSearchBisection(xk, d, c1, c2, func, ret_n_eval=False):
     gk = func(1, xk).dot(d)  # initial slope
     n_eval += 1
 
-    if out == 1:
+    if output:
         print(f"Interval = {alpha_l:8.5f}, {alpha_u:8.5f}")
 
     fk1 = func(0, xk+alpha*d)         # value at new trial point
@@ -61,7 +60,7 @@ def LineSearchBisection(xk, d, c1, c2, func, ret_n_eval=False):
             alpha_u = alpha
             alpha = 0.5*(alpha_l + alpha_u)
 
-            if (out == 1):
+            if output:
                 print(f"alpha = {alpha_old:f} does not satisfy Armijo")
                 print(f"New Interval: {alpha_l:f}, {alpha_u:f}")
 
@@ -78,14 +77,14 @@ def LineSearchBisection(xk, d, c1, c2, func, ret_n_eval=False):
             else:
                 alpha = 0.5*(alpha_l+alpha_u)
 
-            if (out == 1):
+            if output:
                 print(f"alpha = {alpha_old:f} does not satisfy curvature condition")
                 print(f"New Interval: {alpha_l:f}, {alpha_u:f}")
 
         else:
             found = 1
 
-        if (out == 1):
+        if output:
             print(f"return alpha = {alpha:f}")
 
         fk1 = func(0, xk+alpha*d)  # value at new trial point

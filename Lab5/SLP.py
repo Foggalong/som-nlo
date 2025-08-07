@@ -25,8 +25,9 @@ max_iter = 50
 
 tol = 1e-6  # tolerance for the line search method
 
-out = 1
+output = 1  # takes 0, 1, or 2
 # ------------------ end parameters for the method --------------------------
+
 if problem == "poolhav1":
     # nlfile = "ph1sc.nl"
     nlfile = "ph1sm.nl"
@@ -46,7 +47,7 @@ nlp = NLP.NonlinearProblem(nlfile)
 # x0 = np.array([0.1, 0.9, 0.1, 0.9, 0.1, 0.9])
 x0 = 0.3*np.ones(nlp.nvar)
 
-if out >= 2:
+if output == 2:
     print(f"x0 =\n{x0}")
 
 
@@ -64,7 +65,7 @@ xk = x0
 
 # iterate until maximal number of iteration reached
 for iter in range(max_iter):
-    if out >= 2:
+    if output == 2:
         print(f"================ iter {iter:d} =================")
         print(xk)
 
@@ -77,10 +78,10 @@ for iter in range(max_iter):
     # and evaluate total constraint violation
     h = util.eval_cviol(nlp, c)
 
-    if out >= 1:
+    if output:
         print(f"SLP it {iter+1:3d}: f = {f:12.6f}, |g(x)+|+|h(x)| = {h:12.5g}")
-    if out >= 2:
-        print(xk)
+        if output == 2:
+            print(xk)
 
     # The NLP is min f(x) subject to cl <= c(x) <= cu, bl <= x <= bu
 
@@ -120,7 +121,7 @@ for iter in range(max_iter):
         else:
             rho = rho/4.
 
-        if out >= 1:
+        if output:
             print(f"new rho = {rho:f}")
     else:
         xk = xkp

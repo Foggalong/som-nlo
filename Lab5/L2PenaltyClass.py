@@ -9,8 +9,6 @@ nlp = None
 
 default_fact = 50.0
 
-out = 0
-
 
 class L2Penalty:
     """
@@ -43,7 +41,7 @@ class L2Penalty:
     def get_nlp_bu(self):
         return nlp.bu
 
-    def l2pen(self, order, x):
+    def l2pen(self, order, x, output=False):
         x = x.flatten()  # in case it was passed as 2-d array.
         # n = x.size
 
@@ -79,7 +77,7 @@ class L2Penalty:
             df = nlp.grad(x)
             c = nlp.cons(x)
             jac = nlp.jac(x)
-            if out >= 1:
+            if output:
                 print(f"x = \n{x}")
                 print(f"df = \n{df}")
                 print(f"c = \n{c}")
@@ -97,7 +95,7 @@ class L2Penalty:
                 if x[i] > nlp.bu[i]:
                     df[i] += fact*(x[i]-nlp.bu[i])
 
-            if out >= 1:
+            if output:
                 print(f"df = \n{df}")
 
             return df
