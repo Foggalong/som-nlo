@@ -20,10 +20,8 @@ def sourceloc(ord, x, y=None):
 
     if y is None:
         x = np.atleast_2d(x)  # convert to a 2d array if it was 1d
-        shpx = np.shape(x)
-        # x
-        # shpx
-        if shpx[1] > shpx[0]:
+        shape_x = np.shape(x)
+        if shape_x[1] > shape_x[0]:
             x = np.transpose(x)
 
         # and get the components (need two indices since it is a 2-d array)

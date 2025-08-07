@@ -4,7 +4,7 @@ import numpy as np
 # from chebyquad import chebyquad
 from L2PenaltyClass import L2Penalty as L2PC
 from GenericLineSearchMethod import GLSM
-#from GenericTrustRegionMethod import GTRM
+# from GenericTrustRegionMethod import GTRM
 
 # ------------------ parameters for the method --------------------------
 # function can be "chebyquad", "nls"

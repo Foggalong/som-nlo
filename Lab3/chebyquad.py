@@ -40,11 +40,11 @@ def chebyquad(ord, x):
 
     # if we just want the function value
     if ord == 0:
-        fvec = get_fvec(x)
-        return np.sum(fvec*fvec)
+        f_vec = get_f_vec(x)
+        return np.sum(f_vec*f_vec)
 
     elif ord == 1:
-        fvec = get_fvec(x)
+        f_vec = get_f_vec(x)
         J = np.zeros((n, n))
         tk = 1./n
         for j in range(n):
@@ -67,24 +67,24 @@ def chebyquad(ord, x):
         # => d/dx_i f(x) = sum_k 2f_k(x) d/dxi f(k)
         g = np.zeros(n)
         for k in range(n):
-            g += 2*fvec[k]*J[k]
+            g += 2*f_vec[k]*J[k]
         return g
 
     elif ord == 2:
         H = np.zeros((n, n))
-        hesd = np.zeros(n)  # these are the diagonal elements of the Hessian
-        hesl = np.zeros(round(n*(n+1)/2))  # L elements by row
-        gvec = np.zeros(n)
+        hes_d = np.zeros(n)  # these are the diagonal elements of the Hessian
+        hes_l = np.zeros(round(n*(n+1)/2))  # L elements by row
+        g_vec = np.zeros(n)
 
-        # ----- first get the fvec
-        fvec = get_fvec(x)
+        # ----- first get the f_vec
+        f_vec = get_f_vec(x)
 
         # ---------------------
         d1 = 1./n
         d2 = 2*d1
         im = 0
         for j in range(n):
-            hesd[j] = 4*d1
+            hes_d[j] = 4*d1
             H[j][j] = 4*d1
             t1 = 1
             t2 = 2*x[j] - 1
@@ -93,7 +93,7 @@ def chebyquad(ord, x):
             s2 = 2
             p1 = 0
             p2 = 0
-            gvec[0] = s2
+            g_vec[0] = s2
             for i in range(1, n):
                 th = 4*t2 + t*s2 - s1
                 s1 = s2
@@ -104,15 +104,15 @@ def chebyquad(ord, x):
                 th = 8*s1 + t*p2 - p1
                 p1 = p2
                 p2 = th
-                gvec[i] = s2
-                hesd[j] += fvec[i]*th + d1*s2**2
-                H[j][j] += fvec[i]*th + d1*s2**2
+                g_vec[i] = s2
+                hes_d[j] += f_vec[i]*th + d1*s2**2
+                H[j][j] += f_vec[i]*th + d1*s2**2
 
-            hesd[j] = d2*hesd[j]
+            hes_d[j] = d2*hes_d[j]
             H[j][j] = d2*H[j][j]
             for k in range(j):
                 im += 1
-                hesl[im] = 0
+                hes_l[im] = 0
                 H[k][j] = 0  # ??
                 H[j][k] = 0  # ??
                 tt1 = 1
@@ -121,9 +121,9 @@ def chebyquad(ord, x):
                 ss1 = 0
                 ss2 = 2
                 for i in range(n):
-                    hesl[im] += ss2*gvec[i]
-                    H[k][j] += ss2*gvec[i]
-                    H[j][k] += ss2*gvec[i]
+                    hes_l[im] += ss2*g_vec[i]
+                    H[k][j] += ss2*g_vec[i]
+                    H[j][k] += ss2*g_vec[i]
                     tth = 4*tt2 + tt*ss2 - ss1
                     ss1 = ss2
                     ss2 = tth
@@ -131,26 +131,26 @@ def chebyquad(ord, x):
                     tt1 = tt2
                     tt2 = tth
 
-                hesl[im] = d2*d1*hesl[im]
+                hes_l[im] = d2*d1*hes_l[im]
                 H[k][j] = d2*d1*H[k][j]
                 H[j][k] = d2*d1*H[j][k]
 
-        # H = hesdl2H (hesd, hesl)
+        # H = hes_dl2H (hes_d, hes_l)
 
         return H
     else:
         print("first argument must be 0, 1 or 2.")
 
 
-def get_fvec(x):
+def get_f_vec(x):
     n = x.size
-    fvec = np.zeros(n)   # vector to build up fi(x)
+    f_vec = np.zeros(n)   # vector to build up fi(x)
     for j in range(n):    # for all values x_j
         temp1 = 1            # T0 (or T_{n-1})
         temp2 = 2*x[j] - 1   # T1 (or T_n or y)
         temp = 2*temp2       # 2*T_n(x)
         for i in range(n):
-            fvec[i] += temp2
+            f_vec[i] += temp2
             ti = temp*temp2 - temp1   # T_{n+1} =
             temp1 = temp2
             temp2 = ti
@@ -158,30 +158,30 @@ def get_fvec(x):
     tk = 1./n
     iev = -1  # i is odd
     for k in range(n):
-        fvec[k] = tk*fvec[k]
+        f_vec[k] = tk*f_vec[k]
         if (iev > 0):  # if i is even
-            fvec[k] += 1./((k+1)**2 - 1)
+            f_vec[k] += 1./((k+1)**2 - 1)
         iev = -iev
 
-    return fvec
+    return f_vec
 
 
-def hesdl2H(hesd, hesl):
+def hes_dl2H(hes_d, hes_l):
     """
-    Reconstitute the Hessian matrix H from hesd and hesl
-    hesd : a column matrix, the diagonal part of the Hessian
-    hesl : a column matrix, the lower part terms, row by row.
+    Reconstitute the Hessian matrix H from hes_d and hes_l
+    hes_d : a column matrix, the diagonal part of the Hessian
+    hes_l : a column matrix, the lower part terms, row by row.
     """
 
-    H = np.diag(hesd)
-    n = hesd.size
+    H = np.diag(hes_d)
+    n = hes_d.size
     kc = 1
     k1 = 1
     k2 = 1
     # for i = 2:n
     for i in range(1, n):
-        H[i][1:i-1] = hesl[k1:k2]
-        H[1:i-1][i] = hesl[k1:k2]
+        H[i][1:i-1] = hes_l[k1:k2]
+        H[1:i-1][i] = hes_l[k1:k2]
         kc += 1
         k1 = k2 + 1
         k2 = k1 + kc - 1

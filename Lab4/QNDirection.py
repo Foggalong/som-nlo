@@ -12,7 +12,7 @@ def QNDirection(Hk, xkp, xk, gkp, gk, output=True):
 
     - It uses a variant that updates H (by default)
 
-    - it needs to be passed the previous H (and also yk and deltak)
+    - it needs to be passed the previous H (and also yk and delta_k)
 
     - It supports SR1, DFP and BFGS
 

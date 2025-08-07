@@ -76,7 +76,7 @@ for iter in range(max_iter):
     Jk = nlp.jac(xk).transpose()  # Jacobian of constraints
 
     # and evaluate total constraint violation
-    h = util.eval_cviol(nlp, c)
+    h = util.eval_constraint_violation(nlp, c)
 
     if output:
         print(f"SLP it {iter+1:3d}: f = {f:12.6f}, |g(x)+|+|h(x)| = {h:12.5g}")

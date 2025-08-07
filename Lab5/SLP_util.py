@@ -3,7 +3,7 @@ import numpy as np
 import NonlinearProblem as NLP
 
 
-def eval_cviol(nlp, c):
+def eval_constraint_violation(nlp, c):
     h = 0.0
     for j in range(nlp.ncon):
         if c[j] > nlp.cu[j]:
@@ -22,11 +22,11 @@ def is_improvement(nlp, xk, xkp, output=True):
 
     f = nlp.obj(xk)
     c = nlp.cons(xk)
-    h = eval_cviol(nlp, c)
+    h = eval_constraint_violation(nlp, c)
 
     fp = nlp.obj(xkp)
     cp = nlp.cons(xkp)
-    hp = eval_cviol(nlp, cp)
+    hp = eval_constraint_violation(nlp, cp)
 
     # work out value of the merit function at both the current and new point
     m = f+gamma*h

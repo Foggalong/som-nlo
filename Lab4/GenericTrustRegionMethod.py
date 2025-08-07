@@ -107,15 +107,15 @@ def GTRM(x0, func, eps, output=1):
         tot_f_eval += 1
 
         # predicted decrease = m(0) - m(dk) =
-        pred_dec = -(0.5*np.dot(dk, np.dot(B, dk)) + np.dot(g, dk))
+        predicted_decrease = -(0.5*np.dot(dk, np.dot(B, dk)) + np.dot(g, dk))
         # actual decrease = f(xk) - f(xkp)
         actual_dec = fk - fkp
         if output == 2:
-            print(f"  pred dec = {pred_dec:8.5f}")
-            print(f"  actu dec = {actual_dec:8.5f}")
+            print(f"  predicted decrease = {predicted_decrease:8.5f}")
+            print(f"  actual decrease = {actual_dec:8.5f}")
 
         # delta to predicted/actual
-        delta = actual_dec/pred_dec
+        delta = actual_dec/predicted_decrease
         if output == 2:
             print(f"  -> delta = {delta:8.5f}")
 

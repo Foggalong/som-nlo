@@ -9,18 +9,16 @@ from QNDirection import QNDirection    # Quasi-Newton
 
 # ------------------ parameters for the method --------------------------
 
-# direction can be 'CD', 'SD', 'CG' for coordinate descent, steepest descent
-#                  'Newton', QN'    for Newton and Quasi-Newton
-
-# conjugate gradient
-# direction = "Newton"
+# direction can be:
+# -'CD' for coordinate descent,
+# -'SD' for steepest descent,
+# -'CG' for conjugate gradient,
+# -'Newton' for Newton,
+# -'QN' for Quasi-Newton.
 direction = "CG"
-# direction = "QN"
 
 # line search can be 'Exact', 'Armijo', 'Wolfe', '1overk', 'fullstep'
-# linesearch = "Armijo"
 linesearch = "Exact"
-# linesearch = "fullstep"
 
 # set line search method parameters
 c1 = 0.1  # for Armijo/Backtracking linesearch
@@ -29,12 +27,10 @@ tol = 1e-7  # tolerance for exact linesearch
 max_iterations = 100  # iteration limit
 do_CG_restarts = False  # restart CG method every n iteration
 
-out = 1  # printing from method: 0=quiet, 1=path, 2=diagnostic
-
 # ------------------ end parameters for the method --------------------------
 
 
-def GLSM(x0, func, eps):
+def GLSM(x0, func, eps, output=1):
     """
     Generic Line Search Method: applies a generic line search method to
     optimize a given function
@@ -60,11 +56,12 @@ def GLSM(x0, func, eps):
     from rosenbrock import rosenbrock
     from GenericLineSearchMethod import GLSM
     path = GLSM(x0, rosenbrock, 1e-4)
+
+    output = 1  # printing from method: 0=quiet, 1=path, 2=diagnostic
     """
 
-    if (not isinstance(x0, np.ndarray)):
-        print("The argument x0 must be a np.array")
-        return
+    if not isinstance(x0, np.ndarray):
+        raise TypeError("The argument x0 must be a np.array")
 
     n = x0.size
     # this is to keep a list of iterates
@@ -76,13 +73,12 @@ def GLSM(x0, func, eps):
     iterate_list.append(np.array(xk))
     tot_n_eval = 1
 
-    print(xk)
-    print(fk)
-    print(gk)
-    if out == 2:
-        print(f"Initial g0 = \n{gk}")
-
-    if out == 1:
+    if output:
+        print(xk)
+        print(fk)
+        print(gk)
+        if output == 2:
+            print(f"Initial g0 = \n{gk}")
         print(f"f = {fk:8.5g}, |g| = {LA.norm(gk):8.5g}")
 
     # set these for Conjugate Gradients
@@ -131,12 +127,13 @@ def GLSM(x0, func, eps):
 
         # check for descent direction
         if dk.dot(gk) >= 0:
-            print(f"dk = \n{dk}")
+            if output:
+                print(f"dk = \n{dk}")
             raise ValueError("search direction is not a descent direction: STOP")
             dk = -gk
 
         # - - - - - - - - - -  do a line search - - - - - - - - - -
-        if out > 1:
+        if output == 2:
             print(f"dk = \n{dk}")
 
         # counter for number of function evaluations in line search method
@@ -160,7 +157,7 @@ def GLSM(x0, func, eps):
             raise ValueError("Linesearch code not recognized")
 
         tot_n_eval += n_eval
-        if out >= 1:
+        if output:
             print(f"Line search took {n_eval} function evaluation")
 
         # remember last xk for conjugate gradients and QN
@@ -179,13 +176,14 @@ def GLSM(x0, func, eps):
 
         iterate_list.append(np.array(xk))
 
-        if out >= 1:
+        if output:
             print(f"it = {iterations:3d}: f = {fk:8.5g}, |g| = {LA.norm(gk):8.5g}")
-        if out > 1:
-            print(f"xk = {xk}")
-            print(f"gk = {gk}")
+            if output == 2:
+                print(f"xk = {xk}")
+                print(f"gk = {gk}")
 
-    print(f"Hessian at sol:\n{func(2, xk)}")
+    if output:
+        print(f"Hessian at sol:\n{func(2, xk)}")
+        print(f"GLSM took total of {tot_n_eval} function evaluations")
 
-    print(f"GLSM took total of {tot_n_eval} function evaluations")
     return np.array(iterate_list)

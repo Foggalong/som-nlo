@@ -17,7 +17,7 @@ def solveLP(c, A, bl, bu, cl, cu, output=False):
         min c'*x subject to A_ub*x <= b_ub, A_eq*x = b_eq, cl <= x <= cu
 
     This method identifies (and keeps) the equality constraints, whereas
-    the inequality (one or two sided) are tranformed from
+    the inequality (one or two sided) are transformed from
 
         bl <= Ax <= bu     to     Ax - s = 0, bl <= s <= bu
 
@@ -42,34 +42,34 @@ def solveLP(c, A, bl, bu, cl, cu, output=False):
 
     # count number of inequality constraints in A
 
-    n_ineq = 0
+    n_inequalities = 0
     for j in range(m):
-        if np.abs(bu[j]-bl[j])>1e-8:
-            n_ineq += 1
+        if np.abs(bu[j]-bl[j]) > 1e-8:
+            n_inequalities += 1
 
     # set up a matrix S for slacks (Ax - Ss = 0). Also vectors to hold
     # - bounds for s: scl, scu
     # = the new vector b (old bounds for orig equality c/s and 0 for others)
-    S = np.zeros((n_ineq, m))
-    newb = bl.copy()
-    scl = np.zeros(n_ineq)
-    scu = np.zeros(n_ineq)
-    cnt = 0
+    S = np.zeros((n_inequalities, m))
+    new_b = bl.copy()
+    scl = np.zeros(n_inequalities)
+    scu = np.zeros(n_inequalities)
+    count = 0
     # loop through all constraints and set up S, scl, scu, b
     for j in range(m):
         if np.abs(bu[j]-bl[j]) > 1e-8:
-            S[cnt, j] = 1.0
-            scl[cnt] = bl[j]
-            scu[cnt] = bu[j]
-            newb[j] = 0.0
-            cnt += 1
+            S[count, j] = 1.0
+            scl[count] = bl[j]
+            scu[count] = bu[j]
+            new_b[j] = 0.0
+            count += 1
 
     # now we can rewrite bl <= A*x <= bu, cl<=x<=cu as
-    #    [A -S]*[x;s] = newb, scl<=s<=scu, cl<=x<=cu
+    #    [A -S]*[x;s] = new_b, scl<=s<=scu, cl<=x<=cu
 
     # define augmented c, A to pass to linprog
-    caug = np.append(c, np.zeros(n_ineq))
-    AAug = np.block([A, -S.transpose()])
+    aug_c = np.append(c, np.zeros(n_inequalities))
+    aug_A = np.block([A, -S.transpose()])
     # print(A.shape)
     # print(S.shape)
 
@@ -77,11 +77,11 @@ def solveLP(c, A, bl, bu, cl, cu, output=False):
     bounds = []
     for i in range(n):
         bounds.append((cl[i], cu[i]))
-    for i in range(n_ineq):
+    for i in range(n_inequalities):
         bounds.append((scl[i], scu[i]))
 
     # call linprog
-    res = linprog(caug, A_eq=AAug, b_eq = newb, bounds = bounds)
+    res = linprog(aug_c, A_eq=aug_A, b_eq=new_b, bounds=bounds)
 
     if output:
         print(res.message)
@@ -104,7 +104,7 @@ def solveLP(c, A, bl, bu, cl, cu, output=False):
 # -> we can work them out by hand (I guess we can always solve the dual)
 
 # c - A'*lam - mu = 0
-# to work them out set lamda/mu=0 for basic variables (not at bounds)
+# to work them out set lambda/mu=0 for basic variables (not at bounds)
 # the rest should then just give a square linear system of equations
 
 # code below was a (at the moment) abandoned attempt
@@ -113,8 +113,8 @@ def solveLP(c, A, bl, bu, cl, cu, output=False):
 # for i in range(m):
     # print(f"bl, Ax, bu[{i:d}]: {bl[i]:f} {ax[i]:f} {bu[i]:f}")
 
-# print(AAug.shape)
-# print(caug.shape)
+# print(aug_A.shape)
+# print(aug_c.shape)
 # # find number of res.x solution at bounds
 # natbnd = 0
 # active = []
@@ -124,7 +124,7 @@ def solveLP(c, A, bl, bu, cl, cu, output=False):
 #         active.append(True)
 #     else:
 #         active.append(False)
-# for i in range(n_ineq):
+# for i in range(n_inequalities):
 #     if np.abs(res.x[n+i]-scl[i])<1e-6 or np.abs(res.x[n+i]-scu[i])<1e-6:
 #         natbnd += 1
 #         active.append(True)

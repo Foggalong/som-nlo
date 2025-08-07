@@ -21,8 +21,8 @@ def simplequad(ord, x, y=None, *, Q=np.array([[1, 0], [0, 1]]), b=np.array([0, 0
         # (in row or column orientation). we convert whatever it is into a
         # 2-d np.array (column) make sure that x is a column vector
         x = np.atleast_2d(x)  # convert to a 2d array if it was 1d
-        shpx = np.shape(x)
-        if shpx[1] > shpx[0]:
+        shape_x = np.shape(x)
+        if shape_x[1] > shape_x[0]:
             x = np.transpose(x)
 
         # and get the components (need two indices since it is a 2-d array)

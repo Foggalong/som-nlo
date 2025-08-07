@@ -81,8 +81,8 @@ class NonlinearProblem:
         # read eighth line: nonzeros in Jacobian, gradients
         l1 = f.readline()
         tok = l1.split()
-        self.nzjac = int(tok[0])
-        self.nzgrad = int(tok[1])
+        self.nz_jac = int(tok[0])
+        self.nz_grad = int(tok[1])
 
         # read ninth line: max name length
         l1 = f.readline()

@@ -7,27 +7,27 @@ class NLTreeNode:
     def __init__(self, type, data, out=False):
         self.data = data
         self.type = type
-        self.nchd = 0
+        self.n_children = 0
         self.children = []
-        self.nprt = 0
+        self.n_parents = 0
         self.parents = []
         self.output = out
 
-    # def __init__(self, data, nchd, children, nprt, parents):
+    # def __init__(self, data, n_children, children, n_parents, parents):
     #  self.data = data
-    #  self.nchd = nchd
+    #  self.n_children = n_children
     #  self.children = children
-    #  self.nprt = nprt
+    #  self.n_parents = n_parents
     #  self.parents = parents
     #  self.output = False
 
     def add_chd(self, chd):
-        self.nchd += 1
+        self.n_children += 1
         self.children.append(chd)
         chd.add_prt(self)
 
     def add_prt(self, prt):
-        self.nprt += 1
+        self.n_parents += 1
         self.parents.append(prt)
 
     def set_data(self, data):
@@ -87,7 +87,7 @@ class NLTreeNode:
             return np.sin(f1)
         elif self.type == "sum":
             ret = 0
-            for i in range(self.nchd):
+            for i in range(self.n_children):
                 ret += self.children[i].eval_val(x)
             return ret
         else:
@@ -150,7 +150,7 @@ class NLTreeNode:
         elif self.type == "sum":
             val = 0
             gd = np.zeros(n)
-            for i in range(self.nchd):
+            for i in range(self.n_children):
                 vi, gdi = self.children[i].eval_grad_forwardADTree(x)
                 val += vi
                 gd += gdi
@@ -227,7 +227,7 @@ class NLTreeNode:
             val = 0
             gd = np.zeros(n)
             H = np.zeros((n, n))
-            for i in range(self.nchd):
+            for i in range(self.n_children):
                 vi, gdi, Hi = self.children[i].eval_hess_forwardADTree(x)
                 val += vi
                 gd += gdi
@@ -242,7 +242,7 @@ class NLTreeNode:
         # for brackets need to check if node above has higher precedence
         # -> then include brackets
         s = []
-        for i in range(self.nchd):
+        for i in range(self.n_children):
             s.append(self.children[i].to_string())
 
         if self.type == "n":
@@ -267,7 +267,7 @@ class NLTreeNode:
             return "sin("+s[0]+")"
         elif self.type == "sum":
             ret = "("
-            for i in range(self.nchd):
+            for i in range(self.n_children):
                 if i > 0:
                     ret += "+"
                 ret += s[i]
@@ -286,11 +286,11 @@ class NLTreeNode:
         varnodes = [None]*nvar
         self._add_node_to_flat(flat, varnodes)
 
-        cnt = 0
-        for nd in flat:
+        count = 0
+        for node in flat:
             if self.output:
-                print(f"nd[{cnt:d}] = {nd.type:s} ({nd.data:f}), chd = {nd.nchd:d}, nprt = {nd.nprt:d}")
-            cnt += 1
+                print(f"node[{count:d}] = {node.type:s} ({node.data:f}), children = {node.n_children:d}, parents = {node.n_parents:d}")
+            count += 1
         return flat
 
     def _add_node_to_flat(self, flat, varnodes):
@@ -316,12 +316,12 @@ class NLTreeNode:
                 pos = varnodes[ix]
                 if self.output:
                     print(f"flat[{pos:d}] is type = {flat[pos].type:s}, ix = {int(flat[pos].data):d}")
-                prnt_nd = self.parents[0]
+                parent_node = self.parents[0]
                 # how do we know which child this is?
         else:
             flat.append(self)
-        # print(f"Called _add_node_to_flat. type = {self.type:s}, nchd = {self.nchd:d}")
+        # print(f"Called _add_node_to_flat. type = {self.type:s}, children = {self.n_children:d}")
 
-        for i in range(self.nchd):
+        for i in range(self.n_children):
             chd = self.children[i]
             chd._add_node_to_flat(flat, varnodes)
