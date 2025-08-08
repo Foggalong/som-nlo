@@ -1,4 +1,4 @@
-import math
+from math import sqrt
 
 
 def pi_iter1_arctan(n):
@@ -35,13 +35,13 @@ def pi_iter2_archim(n):
     """
     terms = []
 
-    an = 2*math.sqrt(3)
+    an = 2*sqrt(3)
     bn = 3
     terms.append(an)
 
     for i in range(n-1):
         an = 2*an*bn/(an+bn)
-        bn = math.sqrt(an*bn)
+        bn = sqrt(an*bn)
 
         terms.append(an)
 
@@ -55,7 +55,7 @@ def pi_iter3_borwein(n):
 
         a0 = sqrt(2)
         b0 = 0
-        p0 = 2*sqrt(2)
+        p0 = 2 + sqrt(2)
 
         a_{n+1} = (sqrt(an)+1/sqrt(an))/2
         b_{n+1} = (1+bn)*sqrt(an)/(an+bn)
@@ -66,17 +66,19 @@ def pi_iter3_borwein(n):
     """
     terms = []
 
-    an = math.sqrt(2)
+    an = sqrt(2)
     bn = 0
-    pn = 2+math.sqrt(2)
+    pn = 2+sqrt(2)
     terms.append(pn)
 
     for i in range(n-1):
-        san = math.sqrt(an)
-        anp = (san+1./san)/2
-        bnp = (1+bn)*san/(an+bn)
-        an = anp
-        bn = bnp
+        # save for repeated use
+        sqrt_an = sqrt(an)
+
+        an_next = (sqrt_an + 1./sqrt_an)/2
+        bn_next = (1+bn)*sqrt_an/(an+bn)
+        an = an_next
+        bn = bn_next
         pn = (1+an)*pn*bn/(1+bn)
 
         terms.append(pn)
