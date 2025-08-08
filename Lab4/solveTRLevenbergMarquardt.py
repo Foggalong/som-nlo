@@ -1,28 +1,31 @@
 import numpy as np
 from numpy import linalg as LA
 
-max_iterations = 20  # max trials in the lambda-adjustment loop
 
-
-def solveTRLM(B, g, rho, tol, ret_n_eval=False, output=False):
+def solveTRLM(B, g, rho, tol, max_iterations=20, ret_n_eval=False,
+              output=False):
     """
     Solve the L2 Trust Region subproblem with the Levenberg-Marquard method
 
         min 0.5*d'*Q*d + b'*d  subject to ||d||_2 <= rho
 
     by finding lam such that
-
         - dk = -(B+lam I)^{-1} b
-
         - (B+lam I) positive semidefinite
-
         - lam = 0, or ||d_k||_2 = rho
+
+    Takes an optional integer `max_iterations` that sets the maximum number of
+    trials in the lambda-adjustment loop. Default value is 20.
+
+    Takes an optional boolean `ret_n_eval` (default False) that controls
+    whether the number of evaluations is returned as a second output.
+
+    Takes an optional boolean `output` (default `False`) which controls
+    whether to print progress.
     """
 
     if output:
         print(f"Called solveTRLM with rho={rho:8.3g}")
-        print(B)
-        print(g)
 
     n_eval = 0
     norm_dk = np.infty
@@ -51,17 +54,15 @@ def solveTRLM(B, g, rho, tol, ret_n_eval=False, output=False):
         n_eval += 1
         if output:
             print("  initial lam=0 results in pd matrix")
-    except:
+    except LA.LinAlgError:
         isPosDef = False
         if output:
             print("  initial lam=0 not pd")
 
-    if not isPosDef:
-        lam_lo = lam
-    else:
+    if isPosDef:
+        # Solve B*dk = -g using Cholesky factorization
         dk = LA.solve(L, -g)
         dk = LA.solve(L.transpose(), dk)
-        # dk = LA.solve(B, -g)
         norm_dk = LA.norm(dk)
         if output:
             print(f"  lam=0 => pd and |dk|= {norm_dk}")
@@ -73,11 +74,9 @@ def solveTRLM(B, g, rho, tol, ret_n_eval=False, output=False):
             if ret_n_eval:
                 return dk, n_eval
             return dk
-        else:
-            lam_lo = lam
 
-    # if we get here then lam=0 was rejected either because not pos def
-    # or step size too large
+    # if B is not positive definite or |d_k| > rho, reject lam=0
+    lam_lo = lam
 
     # start the loop to find the optimal lam
     iterations = 0
@@ -105,7 +104,7 @@ def solveTRLM(B, g, rho, tol, ret_n_eval=False, output=False):
         isPosDef = True
         try:
             L = LA.cholesky(B+lam*np.eye(n))
-        except:
+        except LA.LinAlgError:
             isPosDef = False
         n_eval += 1
 
@@ -120,7 +119,7 @@ def solveTRLM(B, g, rho, tol, ret_n_eval=False, output=False):
             # dk = LA.solve(B+lam*np.eye(n), -g)
             dk = LA.solve(L, -g)
             dk = LA.solve(L.transpose(), dk)
-            qk = LA.solve(L, dk)  # BUG unused variable
+            # qk = LA.solve(L, dk)  # BUG unused variable
             norm_dk = LA.norm(dk)
             if output:
                 print(f"  lam>0 => pd and |dk|={norm_dk}")
